@@ -1,0 +1,45 @@
+extends bootstrap.pug
+
+block vars
+
+block head
+	title Problems
+	link(rel="stylesheet" href="index.css")
+	link(rel="stylesheet" href="editor.css")
+
+block body
+	nav#navbar.navbar.navbar-light.bg-light
+		span.navbar-brand Problems
+
+		.container
+			a#btn-start.btn.btn-outline-success スタート
+			a#btn-open.btn.btn-outline-secondary 問題ファイルを開く
+			a#btn-edit.btn.btn-outline-secondary 問題を編集
+
+	#root.container-fluid
+		#card.card: .card-body
+			#info-bar.row
+				.col-md-4.col-sm-6.col-12: .row
+					#text-remques.col-6.text-right {{ numQue }}
+					small#text-allques.col-6 / {{ nAllQues }}
+				.col-md-4.col-sm-6.col-12: .row
+					#text-pts.text-right.col-8 {{ points }}
+					small.col-4 pts
+				#text-remtime.text-center.col-md-4.col-12 {{ msecsToString(time) }}
+
+			#text-question.row {{ question }}
+
+			#answers.row
+				button.btn.btn-outline-primary.col-12(type="button" v-for="answer in answers" :data-correct="answer.isCorrect" @click="checkAnswer(answer.isCorrect)") {{ answer.text }}
+
+	#indicator-ac.answer-indicator.fade AC
+	#indicator-wa.answer-indicator.fade WA
+
+	include editor.pug
+
+block script
+	script(src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js")
+	script Vue.config.devtools = true;
+	//script(src="problems.js")
+	//script(src="editor.js")
+	script(src="index.js" type="module")

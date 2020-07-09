@@ -1,0 +1,14 @@
+#problems-title {
+  margin-left: 0.5rem; }
+
+#editor-btn-add-problem {
+  background-color: lightgreen;
+  text-align: center;
+  font: 900 monospace 2rem;
+  color: white; }
+
+.text-editable {
+  border: solid 1px #eee;
+  font: inherit;
+  background: inherit;
+  color: inherit; }
