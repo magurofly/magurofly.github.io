@@ -7,6 +7,16 @@
   font: 900 monospace 2rem;
   color: white; }
 
+.editor-btn-add-answer {
+  text-align: center;
+  font: 900 monospace 1.5rem !important;
+  color: white !important; }
+
+.editor-is-correct {
+  text-align: center;
+  font: 900 monospace 1rem !important;
+  color: white !important; }
+
 .text-editable {
   border: solid 1px #eee;
   font: inherit;

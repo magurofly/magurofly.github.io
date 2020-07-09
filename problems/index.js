@@ -146,6 +146,18 @@ export const editor = (() => {
                     question: "",
                     answers: [{ isCorrect: true, text: "" }]
                 });
+            },
+            addAnswer(problem) {
+                problem.answers.push({ isCorrect: true, text: "" });
+            },
+            download(event) {
+                app.problems = vm.problems;
+                event.target.href = editor.link;
+            },
+            remove(array, element) {
+                const index = array.indexOf(element);
+                if (~index)
+                    array.splice(index, 1);
             }
         }
     });
@@ -157,6 +169,7 @@ export const editor = (() => {
         get link() {
             const text = app.problems.toString();
             const data = new Blob([new TextEncoder().encode(text)], { type: "text/plain" });
+            console.log(text);
             if (link)
                 URL.revokeObjectURL(link);
             link = URL.createObjectURL(data);
