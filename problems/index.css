@@ -6,11 +6,13 @@
   font-family: monospace; }
 
 #text-question {
-  font-size: 3rem; }
+  font-size: 3rem;
+  white-space: pre-wrap; }
 
 #answers button {
+  margin: 0.2rem 0;
   font-size: 2.4rem;
-  margin: 0.2rem 0; }
+  white-space: pre-wrap; }
 
 .answer-indicator {
   position: fixed;
@@ -24,6 +26,24 @@
   color: white;
   text-align: center;
   font: 900 20vw monospace; }
+
+.mark-ac {
+  display: inline;
+  margin: 0.1rem;
+  border-radius: 0.2rem;
+  padding: 0.1rem;
+  background-color: rgba(100, 238, 100, 0.5);
+  font: 900 2rem monospace;
+  color: white; }
+
+.mark-wa {
+  display: inline;
+  margin: 0.1rem;
+  border-radius: 0.2rem;
+  padding: 0.1rem;
+  background-color: rgba(250, 244, 80, 0.5);
+  font: 900 2rem monospace;
+  color: white; }
 
 #indicator-ac {
   background-color: rgba(144, 238, 144, 0.5); }

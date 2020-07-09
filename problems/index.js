@@ -1,6 +1,7 @@
 import { Problems } from "./problems.js";
 export const app = (() => {
     $("#btn-start").click(() => app.start());
+    $("#btn-fetch").click(() => app.openURL());
     $("#btn-open").click(() => app.openFile());
     $("#btn-edit").click(() => app.openEditor());
     const indAC = document.querySelector("#indicator-ac");
@@ -14,6 +15,8 @@ export const app = (() => {
             nAllQues: 0,
             points: 0,
             time: 0,
+            numAC: 0,
+            numWA: 0,
             question: "Are you fine?",
             answers: [
                 { isCorrect: true, text: "Yes!" },
@@ -34,12 +37,14 @@ export const app = (() => {
                     const currentTime = Date.now();
                     vm.points += Math.floor(10e3 / Math.sqrt(currentTime - lapTime + 1));
                     vm.numQue++;
+                    vm.numAC++;
                     lapTime = currentTime;
                     indAC.classList.add("show");
-                    setTimeout(() => indAC.classList.remove("show"), 100);
+                    setTimeout(() => indAC.classList.remove("show"), 200);
                     nextQuestion();
                 }
                 else {
+                    vm.numWA++;
                     lapTime -= 10e3;
                     indWA.classList.add("show");
                     setTimeout(() => indWA.classList.remove("show"), 300);
@@ -114,6 +119,14 @@ export const app = (() => {
                 vm.time = Date.now() - baseTime;
             }, 30);
             nextQuestion();
+        },
+        async openURL() {
+            const url = prompt("問題のURLを入力");
+            if (!url)
+                return;
+            const res = await fetch(url);
+            const text = await res.text();
+            setProblems(Problems.parse(text));
         },
         openFile() {
             const input = document.createElement("input");
