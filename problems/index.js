@@ -1,7 +1,12 @@
 import { Problems } from "./problems.js";
 export const app = (() => {
     $("#btn-start").click(() => app.start());
-    $("#btn-fetch").click(() => app.openURL());
+    $("#btn-fetch").click(() => {
+        const url = prompt("問題のURLを入力");
+        if (!url)
+            return;
+        app.openURL(url);
+    });
     $("#btn-open").click(() => app.openFile());
     $("#btn-edit").click(() => app.openEditor());
     const indAC = document.querySelector("#indicator-ac");
@@ -120,10 +125,7 @@ export const app = (() => {
             }, 30);
             nextQuestion();
         },
-        async openURL() {
-            const url = prompt("問題のURLを入力");
-            if (!url)
-                return;
+        async openURL(url) {
             const res = await fetch(url);
             const text = await res.text();
             setProblems(Problems.parse(text));
@@ -193,3 +195,6 @@ export const editor = (() => {
         }
     };
 })();
+if (location.search.match(/(http.+)$/)) {
+    app.openURL(decodeURIComponent(RegExp.$1));
+}
