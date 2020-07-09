@@ -16,15 +16,21 @@ export class Problems extends Array {
                 const text = line.slice(1).trim();
                 switch (command) {
                     case "?":
+                    case "q":
+                    case "p":
                         if (question) {
                             throw new SyntaxError("a problem cannot contain more than two questions");
                         }
                         question = text;
                         break;
                     case "o":
+                    case "a":
+                    case "y":
                         answers.push({ isCorrect: true, text });
                         break;
                     case "x":
+                    case "w":
+                    case "n":
                         answers.push({ isCorrect: false, text });
                         break;
                     default:
@@ -40,7 +46,7 @@ export class Problems extends Array {
     }
     toString() {
         const info = JSON.stringify(this.info);
-        const body = this.map(({ question, answers }) => `q ${question}\n` + answers.map(({ isCorrect, text }) => `${isCorrect ? "o" : "x"} ${text}`).join("\n")).join("\n\n");
+        const body = this.map(({ question, answers }) => `? ${question}\n` + answers.map(({ isCorrect, text }) => `${isCorrect ? "o" : "x"} ${text}`).join("\n")).join("\n\n");
         return info + "\n" + body;
     }
     add(problem) {
