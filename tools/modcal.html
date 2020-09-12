@@ -311,7 +311,7 @@
           console.error("not square");
           return null;
         }
-        let b = powMod(c, powMod(2, m - i - 1n, p - 1n), p);
+        let b = powMod(c, powMod(2n, m - i - 1n, p - 1n), p);
         m = i;
         c = b * b % p;
         t = t * b * b % p;
