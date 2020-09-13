@@ -1,328 +1,357 @@
 <!doctype html>
 <html lang="ja">
-  <head>
-  <!-- Required meta tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<head>
+	<!-- Required meta tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-  <title>MOD Calculator</title>
+	<title>MOD Calculator</title>
 
-  <style>
-    #calculator {
-      font-size: 4rem;
-      border: black;
-      border-radius: 1rem;
-      padding: 1rem;
-      background: #333;
-      color: white;
-    }
-    #calculator > .row {
-      margin: 1rem;
-    }
-    #calculator-viewpanel {
-      border-radius: 1rem;
-      background: lightgray;
-    }
-    #calculator input[type="text"] {
-      font-family: monospace;
-      border-radius: 1rem;
-      background: lightgray;
-    }
-    #calculator-input {
-      text-align: right;
-      border: white;
-    }
-    #calculator .calculator-btn {
-      border: solid 0.5rem #333;
-      border-radius: 1rem;
-      font-size: 3rem;
-    }
-    #calculator-sign, #calculator-operator, #calculator-error {
-      cursor: default;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      color: #333;
-    }
-    #calculator-error {
-      color: crimson;
-    }
-    #calculator-sign, #calculator-error {
-      visibility: hidden;
-    }
-    #calculator-sign.visible, #calculator-error.visible {
-      visibility: visible;
-    }
-  </style>
-  </head>
-  <body>
+	<style>
+		#calculator {
+			font-size: 4rem;
+			border: black;
+			border-radius: 1rem;
+			p+ing: 1rem;
+			background: #333;
+			color: white;
+		}
+		#calculator > .row {
+			margin: 1rem;
+		}
+		#calculator-viewpanel {
+			border-radius: 1rem;
+			background: lightgray;
+		}
+		#calculator input[type="text"] {
+			font-family: monospace;
+			border-radius: 1rem;
+			background: lightgray;
+		}
+		#calculator-input {
+			text-align: right;
+			border: white;
+		}
+		#calculator .calculator-btn {
+			border: solid 0.5rem #333;
+			border-radius: 1rem;
+			font-size: 3rem;
+		}
+		#calculator-sign, #calculator-operator, #calculator-memory, #calculator-error {
+			cursor: default;
+			font-size: 2rem;
+			color: #333;
+			text-align: center;
+		}
+		#calculator-error {
+			color: crimson;
+		}
+		#calculator-sign, #calculator-memory, #calculator-error {
+			visibility: hidden;
+		}
+		#calculator-sign.visible, #calculator-memory.visible, #calculator-error.visible {
+			visibility: visible;
+		}
+		.middle {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+	</style>
+</head>
+<body>
 
-    <section id="calculator" class="container">
-      <div class="row">
-        <h1>MOD Calculator</h1>
-      </div>
-      <div class="row" id="calculator-viewpanel">
-        <span id="calculator-sign" class="col-1 col-lg-1" :class="{visible: sign}">−</span>
-        <input type="text" id="calculator-input" class="col-8 col-lg-9" :value="value" @input="inputValue">
-        <span id="calculator-operator" class="col-2 col-lg-1" v-html="operatorHTML"></span>
-        <span id="calculator-error" class="col-1 col-lg-1" :class="{visible: error}">E</span>
-      </div>
-      <div class="row">
-        <label for="calculator-input-mod" class="col-6 col-lg-4">MOD = </label>
-        <input type="text" id="calculator-input-mod" class="col-6 col-lg-8" :value="mod" @input="inputMod">
-      </div>
-      <div class="row">
-        <button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="sqrt" @click="command">√</button>
-        <button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="inv" @click="command">x<sup>-1</sup></button>
-        <button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="pow" @click="command">x<sup>y</sup></button>
-        <button type="button" class="col-3 calculator-btn btn btn-danger" data-cmd="clear" @click="command">C</button>
-      </div>
-      <div class="row">
-        <button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="7" @click="command">7</button>
-        <button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="8" @click="command">8</button>
-        <button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="9" @click="command">9</button>
-        <button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="div" @click="command">÷</button>
-      </div>
-      <div class="row">
-        <button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="4" @click="command">4</button>
-        <button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="5" @click="command">5</button>
-        <button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="6" @click="command">6</button>
-        <button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="mul" @click="command">×</button>
-      </div>
-      <div class="row">
-        <button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="1" @click="command">1</button>
-        <button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="2" @click="command">2</button>
-        <button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="3" @click="command">3</button>
-        <button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="sub" @click="command">−</button>
-      </div>
-      <div class="row">
-        <button type="button" class="col-6 calculator-btn btn btn-light" data-cmd="0" @click="command">0</button>
-        <button type="button" class="col-3 calculator-btn btn btn-primary" data-cmd="compute" @click="command">＝</button>
-        <button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="add" @click="command">＋</button>
-      </div>
-    </section>
+	<section id="calculator" class="container">
+		<div class="row">
+			<h1>MOD Calculator</h1>
+		</div>
+		<div class="row" id="calculator-viewpanel">
+			<span id="calculator-sign" class="col-1 col-lg-1" :class="{visible: sign}">−</span>
+			<input type="text" id="calculator-input" class="col-8 col-lg-9" :value="value" @input="inputValue">
+			<div class="col-3 col-lg-2 middle">
+				<div class="row">
+					<span id="calculator-operator" class="col-6" v-html="operatorHTML"></span>
+					<span id="calculator-memory" class="col-3" :class="{visible: memory != 0n}">M</span>
+					<span id="calculator-error" class="col-3" :class="{visible: error}">E</span>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<label for="calculator-input-mod" class="col-6 col-lg-4">MOD = </label>
+			<input type="text" id="calculator-input-mod" class="col-6 col-lg-8" :value="mod" @input="inputMod">
+		</div>
+		<div class="row">
+			<button type="button" class="col-3 calculator-btn btn btn-info" data-cmd="m-" @click="command">M−</button>
+			<button type="button" class="col-3 calculator-btn btn btn-info" data-cmd="m+" @click="command">M＋</button>
+			<button type="button" class="col-3 calculator-btn btn btn-info" data-cmd="mr" @click="command">MR</button>
+			<button type="button" class="col-3 calculator-btn btn btn-info" data-cmd="mc" @click="command">MC</button>
+		</div>
+		<div class="row">
+			<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="sqrt" @click="command">√</button>
+			<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="inv" @click="command">𝑥<sup>−1</sup></button>
+			<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="**" @click="command">𝑥<sup>𝑦</sup></button>
+			<button type="button" class="col-3 calculator-btn btn btn-danger" data-cmd="clear" @click="command">C</button>
+		</div>
+		<div class="row">
+			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="7" @click="command">7</button>
+			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="8" @click="command">8</button>
+			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="9" @click="command">9</button>
+			<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="/" @click="command">÷</button>
+		</div>
+		<div class="row">
+			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="4" @click="command">4</button>
+			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="5" @click="command">5</button>
+			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="6" @click="command">6</button>
+			<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="*" @click="command">×</button>
+		</div>
+		<div class="row">
+			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="1" @click="command">1</button>
+			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="2" @click="command">2</button>
+			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="3" @click="command">3</button>
+			<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="-" @click="command">−</button>
+		</div>
+		<div class="row">
+			<button type="button" class="col-6 calculator-btn btn btn-light" data-cmd="0" @click="command">0</button>
+			<button type="button" class="col-3 calculator-btn btn btn-primary" data-cmd="compute" @click="command">＝</button>
+			<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="+" @click="command">＋</button>
+		</div>
+	</section>
 
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-  <script>
-    function operate(operator, lhs, rhs, mod) {
-      switch (operator) {
-        case "id": {
-          return (rhs % mod + mod) % mod;
-        }
+	<!-- Optional JavaScript -->
+	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script>
+		function operate(operator, lhs, rhs, mod) {
+			switch (operator) {
+				case "id": {
+					return (rhs % mod + mod) % mod;
+				}
 
-        case "add": {
-          return (lhs + rhs) % mod;
-        }
+				case "+": {
+					return (lhs + rhs) % mod;
+				}
 
-        case "sub": {
-          let r = (lhs - rhs) % mod;
-          if (r < 0n) r += mod;
-          return r;
-        }
+				case "-": {
+					let r = (lhs - rhs) % mod;
+					if (r < 0n) r += mod;
+					return r;
+				}
 
-        case "mul": {
-          let r = (lhs * rhs) % mod;
-          if (r < 0n) r += mod;
-          return r;
-        }
+				case "*": {
+					let r = (lhs * rhs) % mod;
+					if (r < 0n) r += mod;
+					return r;
+				}
 
-        case "div": {
-          if (rhs == 0n) return null;
-          return (lhs * operate("inv", lhs, rhs, mod)) % mod;
-        }
+				case "/": {
+					if (rhs == 0n) return null;
+					return (lhs * operate("inv", lhs, rhs, mod)) % mod;
+				}
 
-        case "pow": {
-          return powMod(lhs, rhs, mod);
-        }
+				case "**": {
+					return powMod(lhs, rhs, mod);
+				}
 
-        case "inv": {
-          if (rhs == 0n) return null;
-          return operate("pow", rhs, mod - 2n, mod);
-        }
+				case "inv": {
+					if (rhs == 0n) return null;
+					return operate("**", rhs, mod - 2n, mod);
+				}
 
-        case "sqrt": {
-          return tonelliShanks(rhs, mod);
-        }
+				case "sqrt": {
+					return tonelliShanks(rhs, mod);
+				}
 
-        default:
-          console.error("not implemented");
-          return null;
-      }
-    }
+				default:
+				console.error("not implemented");
+				return null;
+			}
+		}
 
-    const data = {
-      value: 0n,
-      register: 0n,
-      sign: false,
-      state: 0,
-      mod: 1000000007n,
-      error: false,
-      operatorHTML: "",
-      operator: "id",
-    };
-    const methods = {
-      command(event) {
-        const cmd = event.target.dataset.cmd;
-        methods.input(cmd);
-      },
+		const data = {
+			value: 0n,
+			register: 0n,
+			memory: 0n,
+			sign: false,
+			state: 0,
+			mod: 1000000007n,
+			error: false,
+			operatorHTML: "",
+			operator: "id",
+		};
+		const methods = {
+			command(event) {
+				const cmd = event.target.dataset.cmd;
+				methods.input(cmd);
+			},
 
-      input(cmd) {
-        switch (cmd) {
-          case "clear":
-            data.state = 0;
-            data.operator = "id";
-            view.sign = false;
-            view.error = false;
-            view.operatorHTML = "";
-            view.value = 0n;
-            break;
+			input(cmd) {
+				switch (cmd) {
+					case "clear":
+					data.state = 0;
+					data.operator = "id";
+					view.sign = false;
+					view.error = false;
+					view.operatorHTML = "";
+					view.value = 0n;
+					break;
 
-          case "0": case "1": case "2": case "3": case "4":
-          case "5": case "6": case "7": case "8": case "9":
-            if (data.state == 0 || data.state == 4) {
-              view.sign = false;
-              data.operator = "id";
-              view.operatorHTML = "";
-              view.value = 0n;
-              data.state = 1;
-            } else if (data.state == 2) {
-              view.sign = false;
-              data.state = 3;
-              data.value = 0n;
-            }
-            data.value = data.value * 10n + BigInt(cmd);
-            break;
+					case "0": case "1": case "2": case "3": case "4":
+					case "5": case "6": case "7": case "8": case "9":
+					if (data.state == 0 || data.state == 4) {
+						view.sign = false;
+						data.operator = "id";
+						view.operatorHTML = "";
+						view.value = 0n;
+						data.state = 1;
+					} else if (data.state == 2) {
+						view.sign = false;
+						data.state = 3;
+						data.value = 0n;
+					}
+					data.value = data.value * 10n + BigInt(cmd);
+					break;
 
-          case "sub":
-            if (data.state == 0) {
-              data.state = 1;
-              data.sign = true;
-              break;
-            }
-          case "add": case "mul": case "div": case "pow":
-            if (data.state == 0 || data.state == 1) {
-              data.register = methods.getValue();
-              data.operatorHTML = event.target.innerHTML;
-              data.operator = cmd;
-              data.state = 2;
-            } else if (data.state == 2 || data.state == 3) {
-              methods.compute();
-              data.register = methods.getValue();
-              data.operatorHTML = event.target.innerHTML;
-              data.operator = cmd;
-              data.state = 2;
-            }
-            break;
+					case "-":
+					if (data.state == 0) {
+						data.state = 1;
+						data.sign = true;
+						break;
+					}
+					case "+": case "*": case "/": case "**":
+					if (data.state == 0 || data.state == 1 || data.state == 4) {
+						data.register = methods.getValue();
+						data.operatorHTML = event.target.innerHTML;
+						data.operator = cmd;
+						data.state = 2;
+					} else if (data.state == 2 || data.state == 3) {
+						methods.compute();
+						data.register = methods.getValue();
+						data.operatorHTML = event.target.innerHTML;
+						data.operator = cmd;
+						data.state = 2;
+					}
+					break;
 
-          case "inv": case "sqrt":
-            view.operatorHTML = event.target.innerHTML;
-            data.operator = cmd;
-            data.state = 2;
-            methods.compute();
-            break;
+					case "inv": case "sqrt":
+					view.operatorHTML = event.target.innerHTML;
+					data.operator = cmd;
+					data.state = 4;
+					methods.compute();
+					break;
 
-          case "compute":
-            if (data.state == 2 || data.state == 3 || data.state == 4) {
-              methods.compute();
-              data.state = 4;
-            }
-            break;
+					case "compute":
+					methods.compute();
+					data.state = 4;
+					break;
 
-          default:
-        }
-      },
+					case "m+":
+					view.memory += data.value;
+					break;
 
-      getValue() {
-        let value = data.value;
-        if (data.sign) value = -value;
-        return value;
-      },
+					case "m-":
+					view.memory = (data.mod - data.value % data.mod) % data.mod;
+					break;
 
-      compute() {
-        let r = operate(data.operator, data.register, methods.getValue(), data.mod);
-        if (r != null) {
-          view.value = r;
-        } else {
-          data.error = true;
-          data.state = 5;
-        }
-      },
+					case "mr":
+					view.value = data.memory;
+					break;
 
-      inputValue(event) {
-        view.value = BigInt(event.target.value);
-      },
+					case "mc":
+					view.memory = 0n;
+					break;
 
-      inputMod(event) {
-        view.mod = BigInt(event.target.value);
-      },
-    };
-    const view = new Vue({
-      el: "#calculator",
-      data,
-      methods,
-    });
+					default:
+				}
+			},
 
-    function powMod(a, b, mod) {
-      let r = 1n;
-      while (b > 0n) {
-        if ((b & 1n) == 1n) r = r * a % mod;
-        a = a * a % mod;
-        b >>= 1n;
-      }
-      return r;
-    }
+			getValue() {
+				let value = data.value;
+				if (data.sign) value = -value;
+				return value;
+			},
+
+			compute() {
+				let r = operate(data.operator, data.register, methods.getValue(), data.mod);
+				if (r != null) {
+					view.value = r;
+				} else {
+					data.error = true;
+					data.state = 5;
+				}
+			},
+
+			inputValue(event) {
+				view.value = BigInt(event.target.value);
+			},
+
+			inputMod(event) {
+				view.mod = BigInt(event.target.value);
+			},
+		};
+		const view = new Vue({
+			el: "#calculator",
+			data,
+			methods,
+		});
+
+		function powMod(a, b, mod) {
+			let r = 1n;
+			while (b > 0n) {
+				if ((b & 1n) == 1n) r = r * a % mod;
+				a = a * a % mod;
+				b >>= 1n;
+			}
+			return r;
+		}
 
 
     // https://flex.phys.tohoku.ac.jp/~maru/implementations/sqrt_modp.php
 
     function tonelliShanks(a, p) {
-      if (a == 0n) return 0n;
-      if (a == 1n) return 1n;
-      let s = 0n;
-      let b = p - 1n;
-      while ((b & 1n) == 0n) {
-        s++;
-        b >>= 1n;
-      }
-      let q = b;
-      let z = 1n;
-      while (powMod(z, (p - 1n) / 2n, p) != p - 1n) z++;
-      let m = s;
-      let c = powMod(z, q, p);
-      let t = powMod(a, q, p);
-      let r = powMod(a, (q + 1n) / 2n, p);
-      while (t != 1n) {
-        let u = t;
-        let i;
-        for (i = 1n; i < m; i++) {
-          u = u * u % p;
-          if (u == 1n) break;
-        }
-        if (u != 1n) {
-          console.error("not square");
-          return null;
-        }
-        let b = powMod(c, powMod(2n, m - i - 1n, p - 1n), p);
-        m = i;
-        c = b * b % p;
-        t = t * b * b % p;
-        r = r * b % p;
-      }
-      if (r * r % p != a) {
-        console.log("not square");
-        return null;
-      }
-      return r;
+    	if (a == 0n) return 0n;
+    	if (a == 1n) return 1n;
+    	let s = 0n;
+    	let b = p - 1n;
+    	while ((b & 1n) == 0n) {
+    		s++;
+    		b >>= 1n;
+    	}
+    	let q = b;
+    	let z = 1n;
+    	while (powMod(z, (p - 1n) / 2n, p) != p - 1n) z++;
+    	let m = s;
+    	let c = powMod(z, q, p);
+    	let t = powMod(a, q, p);
+    	let r = powMod(a, (q + 1n) / 2n, p);
+    	while (t != 1n) {
+    		let u = t;
+    		let i;
+    		for (i = 1n; i < m; i++) {
+    			u = u * u % p;
+    			if (u == 1n) break;
+    		}
+    		if (u != 1n) {
+    			console.error("not square");
+    			return null;
+    		}
+    		let b = powMod(c, powMod(2n, m - i - 1n, p - 1n), p);
+    		m = i;
+    		c = b * b % p;
+    		t = t * b * b % p;
+    		r = r * b % p;
+    	}
+    	if (r * r % p != a) {
+    		console.log("not square");
+    		return null;
+    	}
+    	return r;
     }
-  </script>
-  </body>
+</script>
+</body>
 </html>
