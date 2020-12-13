@@ -1,0 +1,19 @@
+<meta charset=utf8>
+<title>Repeatedly</title>
+<body style="white-space:pre-wrap">
+<script>
+let opts = {};
+for (const pair of location.search.slice(1).split("&")) {
+  const [key, value] = pair.split("=").map(decodeURIComponent);
+  opts[key] = value;
+}
+let element = document.body;
+setInterval(() => {
+  if (opts.begin) element.appendChild(document.createTextNode(opts.begin));
+  const e = document.createElement("span");
+  element.appendChild(e);
+  element = e;
+  if (opts.end) element.appendChild(document.createTextNode(opts.end));
+}, +(opts.interval || 100));
+</script>
+</body>
