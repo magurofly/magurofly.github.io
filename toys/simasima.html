@@ -1,0 +1,31 @@
+<html>
+  <head>
+    <style>
+#filter {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  width: 100vw;
+  height: 100vh;
+  animation: 5ms steps(2) infinite simasima;
+  background: repeating-linear-gradient(to bottom, transparent, transparent 1px, white 1px, white 2px);
+}
+
+@keyframes simasima {
+  0% {
+    background: repeating-linear-gradient(to bottom, transparent, transparent 1px, white 1px, white 2px);
+  }
+  100% {
+    background: repeating-linear-gradient(to bottom, white, white 1px, transparent 1px, transparent 2px);
+  }
+}
+    </style>
+  </head>
+	<body>
+    <input type="text" onchange="document.getElementById('if').src=this.value" placeholder="https://">
+		<iframe src="https://5ch.net" id="if" style="height:100%;width:100%;"></iframe>
+    <div id="filter"></div>
+	</body>
+</html>
