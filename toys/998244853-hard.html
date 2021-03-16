@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <meta name="twitter:card" content="summary">
+    <meta property="og:image" content="https://i.imgur.com/X3cxpTI.png">
+    <meta property="og:title" content="本物を探せ！ (Hard)">
+    <meta property="og:description" content="998244853 & 100000007">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <title>本物を探せ！</title>
+  </head>
+  <body>
+    <main id="main" style="width: 95vw; height: 98vh; position: absolute; left: 0; top: 0; margin: 0; padding: 0;">
+
+    </main>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+    <script>
+      (() => {
+        const fake_primes = "998222353 998288353 9982443353 998444353 9982244353 982244353 998244853 998222453 989244353 99824353 99824453 100000007 1000000009 1000003 10007 107 1000000087 10800007 1000080007 1080000007 10000000807".split(" ");
+        const genuine_primes = "998244353 1000000007".split(" ");
+        const main = $("#main");
+        const flyObjects = [];
+        for (const text of fake_primes) {
+            const button = $(`<button class="btn btn-primary btn-large" style="position: absolute; font-size: 5vmin;">`);
+            button.text(text);
+            button.appendTo(main);
+            button.click(() => button.removeClass("btn-primary").addClass("btn-secondary"));
+            const x = Math.random() * main.width();
+            const y = Math.random() * main.height();
+            const v = 2 + Math.random() * 10;
+            const t = Math.random() * Math.PI * 2;
+            flyObjects.push({ element: button, x, y, v, t });
+        }
+        for (const text of genuine_primes) {
+            const button = $(`<button class="btn btn-primary btn-large" style="position: absolute; font-size: 5vmin;">`);
+            button.click(() => button.removeClass("btn-primary").addClass("btn-success"));
+            button.text(text);
+            button.appendTo(main)
+            const x = Math.random() * main.width();
+            const y = Math.random() * main.height();
+            const v = Math.random() * 10;
+            const t = Math.random() * Math.PI * 2;
+            const a = 0;
+            flyObjects.push({ element: button, x, y, v, t, a });
+        }
+        setInterval(() => {
+            const w = main.width() - 10;
+            const h = main.height() - 5;
+            for (const obj of flyObjects) {
+                obj.v = Math.max(0, Math.min(10, obj.v - 0.5 + Math.random() * 1));
+                obj.a += -0.005 + Math.random() * 0.01;
+                obj.t = obj.t - 0.5 + Math.random();
+                let x = obj.x + obj.v * Math.cos(obj.t);
+                let y = obj.y + obj.v * Math.sin(obj.t);
+                if (x < 0 || x > w || y < 0 || y > h) {
+                    obj.t = obj.t - 1 + Math.random() * 2;
+                }
+                obj.x = Math.max(0, Math.min(w, x));
+                obj.y = Math.max(0, Math.min(h, y));
+                obj.element.css({"left": `${obj.x}px`, "top": `${obj.y}px`});
+            }
+        }, 30);
+      })();
+    </script>
+
+  </body>
+</html>
