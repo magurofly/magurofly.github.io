@@ -15,7 +15,7 @@
     <title>本物を探せ！</title>
   </head>
   <body>
-    <main id="main" style="width: 100vw; height: 100vh; position: absolute; left: 0; top: 0; margin: 0; padding: 0;">
+    <main id="main" style="width: 95vw; height: 98vh; position: absolute; left: 0; top: 0; margin: 0; padding: 0;">
 
     </main>
     <!-- Optional JavaScript -->
@@ -31,7 +31,7 @@
         const main = $("#main");
         const flyObjects = [];
         for (const text of fake_primes) {
-            const button = $(`<button class="btn btn-primary btn-large" style="position: absolute;">`);
+            const button = $(`<button class="btn btn-primary btn-large" style="position: absolute; font-size: 5vmin;">`);
             button.text(text);
             button.appendTo(main);
             button.click(() => button.removeClass("btn-primary").addClass("btn-secondary"));
@@ -42,7 +42,7 @@
             flyObjects.push({ element: button, x, y, v, t });
         }
         for (const text of genuine_primes) {
-            const button = $(`<button class="btn btn-primary btn-large" style="position: absolute;">`);
+            const button = $(`<button class="btn btn-primary btn-large" style="position: absolute; font-size: 5vmin;">`);
             button.click(() => button.removeClass("btn-primary").addClass("btn-success"));
             button.text(text);
             button.appendTo(main)
@@ -54,17 +54,19 @@
             flyObjects.push({ element: button, x, y, v, t, a });
         }
         setInterval(() => {
+            const w = main.width() - 10;
+            const h = main.height() - 5;
             for (const obj of flyObjects) {
                 obj.v = Math.max(0, Math.min(10, obj.v - 0.5 + Math.random() * 1));
                 obj.a += -0.005 + Math.random() * 0.01;
                 obj.t = obj.t - 0.5 + Math.random();
                 let x = obj.x + obj.v * Math.cos(obj.t);
                 let y = obj.y + obj.v * Math.sin(obj.t);
-                if (x < 0 || x > main.width() || y < 0 || y > main.height()) {
+                if (x < 0 || x > w || y < 0 || y > h) {
                     obj.t = obj.t - 1 + Math.random() * 2;
                 }
-                obj.x = Math.max(0, Math.min(main.width(), x));
-                obj.y = Math.max(0, Math.min(main.height(), y));
+                obj.x = Math.max(0, Math.min(w, x));
+                obj.y = Math.max(0, Math.min(h, y));
                 obj.element.css({"left": `${obj.x}px`, "top": `${obj.y}px`});
             }
         }, 30);
