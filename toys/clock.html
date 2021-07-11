@@ -101,12 +101,14 @@ function paint(hour, min, sec) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
+let prev = { hour: 0, min: 0, sec: 0 };
 setInterval(() => {
-	const date = new Date();
+  const date = new Date();
   const sec = date.getSeconds() / 60;
   const min = date.getMinutes() / 60;
   const hour = (date.getHours() % 12 + min) / 12;
-  
+  if (prev.hour == hour && prev.min == min && prev.sec == sec) return;
+  prev = { hour, min, sec };
   paint(hour, min, sec);
 }, 113);
 </script>
