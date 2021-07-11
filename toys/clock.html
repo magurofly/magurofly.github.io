@@ -1,0 +1,104 @@
+<meta charset="UTF-8">
+<title>Clock</title>
+<meta name="twitter:card" content="summary">
+<meta property="og:title" content="Clock">
+<meta property="og:description" content="by grid">
+<canvas id="clock"></canvas>
+<script>
+const canvas = document.getElementById("clock");
+
+const size = Math.min(document.documentElement.clientWidth, document.documentElement.clientHeight);
+canvas.width = canvas.height = size;
+
+const center = { x: size / 2, y: size / 2};
+const clockRadius = size * 0.4;
+const pinRadius = size * 0.01;
+const hourLength = clockRadius * 0.75;
+const minLength = clockRadius * 0.875;
+const secLength = clockRadius;
+
+const ctx = canvas.getContext("2d");
+
+function paint(hour, min, sec) {
+	ctx.clearRect(0, 0, size, size);
+  
+  // draw the vertical grid
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 5; i++) {
+  	const x = center.x + (i - 2) * clockRadius / 2;
+    const r = Math.sqrt(clockRadius**2 - (x - center.x)**2);
+    ctx.beginPath();
+    ctx.moveTo(x, center.y - r);
+    ctx.lineTo(x, center.y + r);
+    ctx.stroke();
+  }
+  
+  // draw the horizontal grid
+  ctx.strokeStyle = "lightgray";
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 5; i++) {
+  	const y = center.y + (i - 2) * clockRadius / 2;
+    const r = Math.sqrt(clockRadius**2 - (y - center.y)**2);
+    ctx.beginPath();
+    ctx.moveTo(center.x - r, y);
+    ctx.lineTo(center.x + r, y);
+    ctx.stroke();
+  }
+  
+  // draw the frame
+  ctx.beginPath();
+  ctx.strokeStyle = "darkgray";
+  ctx.lineWidth = 3;
+  ctx.arc(center.x, center.y, clockRadius, 0, Math.PI * 2, false);
+  ctx.stroke();
+  
+  // draw the pin
+  ctx.beginPath();
+  ctx.fillStyle = "black";
+  ctx.arc(center.x, center.y, pinRadius, 0, Math.PI * 2, false);
+  ctx.fill();
+  
+  // draw the hour hand
+  ctx.translate(center.x, center.y);
+  ctx.rotate((hour - 0.25) * Math.PI * 2);
+  ctx.strokeStyle = "red";
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(hourLength, 0);
+  ctx.stroke();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  
+  // draw the minute hand
+  ctx.translate(center.x, center.y);
+  ctx.rotate((min - 0.25) * Math.PI * 2);
+  ctx.strokeStyle = "blue";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(minLength, 0);
+  ctx.stroke();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  
+  // draw the second hand
+  ctx.translate(center.x, center.y);
+  ctx.rotate((sec - 0.25) * Math.PI * 2);
+  ctx.strokeStyle = "green";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(secLength, 0);
+  ctx.stroke();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+}
+
+setInterval(() => {
+	const date = new Date();
+  const sec = date.getSeconds() / 60;
+  const min = date.getMinutes() / 60;
+  const hour = date.getHours() % 12 / 12;
+  
+  paint(hour, min, sec);
+}, 113);
+</script>
