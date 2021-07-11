@@ -5,10 +5,10 @@
 <meta property="og:description" content="by grid">
 <style>
 #clock {
-	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>
 <canvas id="clock"></canvas>
@@ -28,13 +28,13 @@ const secLength = clockRadius;
 const ctx = canvas.getContext("2d");
 
 function paint(hour, min, sec) {
-	ctx.clearRect(0, 0, size, size);
+  ctx.clearRect(0, 0, size, size);
   
   // draw the vertical grid
-  ctx.strokeStyle = "black";
+  ctx.strokeStyle = "gray";
   ctx.lineWidth = 1;
   for (let i = 0; i < 5; i++) {
-  	const x = center.x + (i - 2) * clockRadius / 2;
+    const x = center.x + (i - 2) * clockRadius / 2;
     const r = Math.sqrt(clockRadius**2 - (x - center.x)**2);
     ctx.beginPath();
     ctx.moveTo(x, center.y - r);
