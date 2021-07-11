@@ -105,7 +105,7 @@ setInterval(() => {
 	const date = new Date();
   const sec = date.getSeconds() / 60;
   const min = date.getMinutes() / 60;
-  const hour = (date.getHours() % 12 + min / 12) / 12;
+  const hour = (date.getHours() % 12 + min) / 12;
   
   paint(hour, min, sec);
 }, 113);
