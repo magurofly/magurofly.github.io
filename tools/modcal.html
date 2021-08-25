@@ -6,8 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 	<!-- Bootstrap CSS -->
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
 	<title>MOD Calculator</title>
     <meta property="og:image" content="https://magurofly.github.io/tools/modcal.png">
     <meta name="twitter:card" content="summary">
@@ -19,7 +18,7 @@
 			font-size: 4rem;
 			border: black;
 			border-radius: 1rem;
-			p+ing: 1rem;
+			padding: 1rem;
 			background: #333;
 			color: white;
 		}
@@ -31,6 +30,7 @@
 			background: lightgray;
 		}
 		#calculator input[type="text"] {
+			font-size: 4rem;
 			font-family: monospace;
 			border-radius: 1rem;
 			background: lightgray;
@@ -72,64 +72,69 @@
 		<div class="row">
 			<h1>MOD Calculator</h1>
 		</div>
-		<div class="row" id="calculator-viewpanel">
-			<span id="calculator-sign" class="col-1 col-lg-1" :class="{visible: sign}">−</span>
-			<input type="text" id="calculator-input" class="col-8 col-lg-9" :value="value" @input="inputValue">
-			<div class="col-3 col-lg-2 middle">
+		<div class="row">
+			<div id="calculator-viewpanel" class="col-12 col-lg-7 p-1 mb-1 order-lg-1">
 				<div class="row">
-					<span id="calculator-operator" class="col-6" v-html="operatorHTML"></span>
-					<span id="calculator-memory" class="col-3" :class="{visible: memory != 0n}">M</span>
-					<span id="calculator-error" class="col-3" :class="{visible: error}">E</span>
+					<span id="calculator-sign" class="col-1 col-lg-1" :class="{visible: sign}">−</span>
+					<input type="text" id="calculator-input" class="col-8 col-lg-9" :value="value" @input="inputValue">
+					<div class="col-3 col-lg-2 middle">
+						<div class="row">
+							<span id="calculator-operator" class="col-6" v-html="operatorHTML"></span>
+							<span id="calculator-memory" class="col-3" :class="{visible: memory != 0n}">M</span>
+							<span id="calculator-error" class="col-3" :class="{visible: error}">E</span>
+						</div>
+					</div>
 				</div>
 			</div>
-		</div>
-		<div class="row">
-			<label for="calculator-input-mod" class="col-6 col-lg-4">MOD = </label>
-			<input type="text" id="calculator-input-mod" class="col-6 col-lg-8" :value="mod" @input="inputMod">
-		</div>
-		<div class="row">
-			<button type="button" class="col-3 calculator-btn btn btn-info" data-cmd="m-" @click="command">M−</button>
-			<button type="button" class="col-3 calculator-btn btn btn-info" data-cmd="m+" @click="command">M＋</button>
-			<button type="button" class="col-3 calculator-btn btn btn-info" data-cmd="mr" @click="command">MR</button>
-			<button type="button" class="col-3 calculator-btn btn btn-info" data-cmd="mc" @click="command">MC</button>
-		</div>
-		<div class="row">
-			<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="sqrt" @click="command">√</button>
-			<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="inv" @click="command">𝑥<sup>−1</sup></button>
-			<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="**" @click="command">𝑥<sup>𝑦</sup></button>
-			<button type="button" class="col-3 calculator-btn btn btn-danger" data-cmd="clear" @click="command">C</button>
-		</div>
-		<div class="row">
-			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="7" @click="command">7</button>
-			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="8" @click="command">8</button>
-			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="9" @click="command">9</button>
-			<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="/" @click="command">÷</button>
-		</div>
-		<div class="row">
-			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="4" @click="command">4</button>
-			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="5" @click="command">5</button>
-			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="6" @click="command">6</button>
-			<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="*" @click="command">×</button>
-		</div>
-		<div class="row">
-			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="1" @click="command">1</button>
-			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="2" @click="command">2</button>
-			<button type="button" class="col-3 calculator-btn btn btn-light" data-cmd="3" @click="command">3</button>
-			<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="-" @click="command">−</button>
-		</div>
-		<div class="row">
-			<button type="button" class="col-6 calculator-btn btn btn-light" data-cmd="0" @click="command">0</button>
-			<button type="button" class="col-3 calculator-btn btn btn-primary" data-cmd="compute" @click="command">＝</button>
-			<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="+" @click="command">＋</button>
+			<div class="col-12 col-lg-5 mb-1 order-lg-2">
+				<div class="form-floating h-100">
+					<input type="text" id="calculator-input-mod" class="form-control h-100" placeholder="1000000007" :value="mod" @input="inputMod">
+					<label for="calculator-input-mod" class="fs-3 text-dark">MOD =</label>
+				</div>
+			</div>
+			<div class="col-12 col-lg-8 order-lg-3">
+				<div class="row">
+					<button type="button" class="col-3 calculator-btn btn btn-info" data-cmd="m-" @click="command">M-</button>
+					<button type="button" class="col-3 calculator-btn btn btn-info" data-cmd="m+" @click="command">M+</button>
+					<button type="button" class="col-3 calculator-btn btn btn-info" data-cmd="mr" @click="command">MR</button>
+					<button type="button" class="col-3 calculator-btn btn btn-info" data-cmd="mc" @click="command">MC</button>
+				</div>
+				<div class="row">
+					<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="sqrt" @click="command">√</button>
+					<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="inv" @click="command">𝑥<sup>−1</sup></button>
+					<button type="button" class="col-3 calculator-btn btn btn-secondary" data-cmd="**" @click="command">𝑥<sup>𝑦</sup></button>
+					<button type="button" class="col-3 calculator-btn btn btn-danger" data-cmd="clear" @click="command">C</button>
+				</div>
+			</div>
+			<div class="col-8 col-lg-12 order-lg-5">
+				<div class="row flex-row-reverse align-items-end">
+					<button type="button" class="col-4 col-lg-3 calculator-btn btn btn-light" data-cmd="9" @click="command">9</button>
+					<button type="button" class="col-4 col-lg-3 calculator-btn btn btn-light" data-cmd="8" @click="command">8</button>
+					<button type="button" class="col-4 col-lg-3 calculator-btn btn btn-light" data-cmd="7" @click="command">7</button>
+					<button type="button" class="col-4 col-lg-3 calculator-btn btn btn-light" data-cmd="6" @click="command">6</button>
+					<button type="button" class="col-4 col-lg-3 calculator-btn btn btn-light" data-cmd="5" @click="command">5</button>
+					<button type="button" class="col-4 col-lg-3 calculator-btn btn btn-light" data-cmd="4" @click="command">4</button>
+					<button type="button" class="col-4 col-lg-3 calculator-btn btn btn-light" data-cmd="3" @click="command">3</button>
+					<button type="button" class="col-4 col-lg-3 calculator-btn btn btn-light" data-cmd="2" @click="command">2</button>
+					<button type="button" class="col-4 col-lg-3 calculator-btn btn btn-light" data-cmd="1" @click="command">1</button>
+					<button type="button" class="col-8 col-lg-3 calculator-btn btn btn-light" data-cmd="0" @click="command">0</button>
+					<button type="button" class="col-4 col-lg-6 calculator-btn btn btn-primary" data-cmd="compute" @click="command">＝</button>
+				</div>
+			</div>
+			<div class="col-4 order-lg-4">
+				<div class="row">
+					<button type="button" class="col-12 col-lg-6 calculator-btn btn btn-secondary" data-cmd="/" @click="command">÷</button>
+					<button type="button" class="col-12 col-lg-6 calculator-btn btn btn-secondary" data-cmd="*" @click="command">×</button>
+					<button type="button" class="col-12 col-lg-6 calculator-btn btn btn-secondary" data-cmd="-" @click="command">−</button>
+					<button type="button" class="col-12 col-lg-6 calculator-btn btn btn-secondary" data-cmd="+" @click="command">＋</button>
+				</div>
+			</div>
 		</div>
 	</section>
 
 	<!-- Optional JavaScript -->
-	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
 	<script>
 		function operate(operator, lhs, rhs, mod) {
 			switch (operator) {
