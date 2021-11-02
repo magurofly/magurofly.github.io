@@ -293,9 +293,9 @@ function binomial(n, r) {
 function part(N, K) {
   const P = [];
   for (let n = 0n; n <= N; n++) {
-    P[n] = [];
+    P[n] = [0n];
   }
-  P[0][0] = 1n;
+  P[0n][0n] = 1n;
   for (let n = 0n; n <= N; n++) {
     for (let k = 1n; k <= K; k++) {
       if (n >= k) {
