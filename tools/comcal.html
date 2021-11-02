@@ -150,7 +150,7 @@ for (const el of document.querySelectorAll(".text-math")) {
 
 const toBigInt = n => {
   try {
-    return toBigInt(n);
+    return BigInt(n);
   } catch (e) {
     return 0n;
   }
