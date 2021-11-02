@@ -141,14 +141,22 @@
         <fieldset class="col-12 col-md-6">
           <legend>ベル数</legend>
           <div class="mb-3">
-            <label class="form-label text-math">$B(n, k)$ ベル数（区別できる $n$ 個のボールを区別できない $k$ 個以下の箱に分割する場合の数）: $O(\min(n, k) \log n)$</label>
+            <label class="form-label text-math">$B_n$ ベル数（区別できる $n$ 個のボールをいくつかのグループに分割する場合の数）: $O(n \log n)$</label>
             <div class="input-group">
               <label for="bell-n" class="input-group-text math">n = </label>
               <input id="bell-n" v-model="bellNText" type="text" class="form-control font-monospace">
-              <label for="bell-k" class="input-group-text math">k = </label>
-              <input id="bell-k" v-model="bellKText" type="text" class="form-control font-monospace">
-              <label for="bell" class="input-group-text math">B(n, k) = </label>
+              <label for="bell" class="input-group-text math">B_n = </label>
               <input id="bell" :value="bell" type="text" class="form-control font-monospace" readonly>
+            </div>
+          </div>
+            <label class="form-label text-math">$B(n, k)$ ベル数（区別できる $n$ 個のボールを区別できない $k$ 個以下の箱に分割する場合の数）: $O(\min(n, k) \log n)$</label>
+            <div class="input-group">
+              <label for="bell2-n" class="input-group-text math">n = </label>
+              <input id="bell2-n" v-model="bell2NText" type="text" class="form-control font-monospace">
+              <label for="bell2-k" class="input-group-text math">k = </label>
+              <input id="bell2-k" v-model="bell2KText" type="text" class="form-control font-monospace">
+              <label for="bell2" class="input-group-text math">B(n, k) = </label>
+              <input id="bell2" :value="bell2" type="text" class="form-control font-monospace" readonly>
             </div>
           </div>
         </fieldset>
@@ -358,8 +366,10 @@ const app = new Vue({
     partition2leKText: "0",
     partition2le: 1n,
     bellNText: "0",
-    bellKText: "0",
     bell: 1n,
+    bell2NText: "0",
+    bell2KText: "0",
+    bell2: 1n,
   },
   computed: {
     modulus: propBigInt("modulusText"),
@@ -379,7 +389,8 @@ const app = new Vue({
     partition2leN: propBigInt("partition2leNText"),
     partition2leK: propBigInt("partition2leKText"),
     bellN: propBigInt("bellNText"),
-    bellK: propBigInt("bellKText"),
+    bell2N: propBigInt("bell2NText"),
+    bell2K: propBigInt("bell2KText"),
   },
   watch: watchers({
     power: {
@@ -456,10 +467,17 @@ const app = new Vue({
       },
     },
     bell: {
-      sensitive: ["useModulus", "modulus", "bellN", "bellK"],
+      sensitive: ["useModulus", "modulus", "bellN"],
       update() {
         const n = this.bellN;
-        const k = this.bellK;
+        return bell(n, n);
+      },
+    },
+    bell2: {
+      sensitive: ["useModulus", "modulus", "bell2N", "bell2K"],
+      update() {
+        const n = this.bell2N;
+        const k = this.bell2K;
         return bell(n, k);
       },
     },
