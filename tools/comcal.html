@@ -27,6 +27,50 @@
         </fieldset>
       </div>
 
+      <fieldset class="col-12">
+        <legend>写像12相</legend>
+        <p class="text-math">$k$ 個の箱に $n$ 個のボールを入れる場合の数。箱を区別するか、ボールを区別するか、箱に入るボールの個数が $0, 1$ か $1$ 個以上か制限なしかで $12$ 種類ある。</p>
+        <div class="mb-3">
+          <div class="input-group">
+            <label for="twelvefold-way-k" class="input-group-text math">k = </label>
+            <input id="twelvefold-way-k" v-model="twelvefoldWayKText" type="text" class="form-control font-monospace">
+            <label for="twelvefold-way-n" class="input-group-text math">n = </label>
+            <input id="twelvefold-way-n" v-model="twelvefoldWayNText" type="text" class="form-control font-monospace">
+          </div>
+        </div>
+        <table class="table">
+          <thead>
+            <tr><th>箱</th><th>ボール</th><th class="math">0, 1</th><th>制限なし</th><th class="text-math">$1$ 個以上</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>区別する</th><th>区別する</th>
+              <td><div class="input-group"><label for="twelvefold-way-dd01" class="input-group-text math">{_k}{\rm P}{_n}</label><input id="twelvefold-way-dd01" :value="twelvefoldWayDD01" type="text" class="form-control font-monospace" readonly></div></td>
+              <td><div class="input-group"><label for="twelvefold-way-dd" class="input-group-text math">k^n</label><input id="twelvefold-way-dd" :value="twelvefoldWayDD" type="text" class="form-control font-monospace" readonly></div></td>
+              <td><div class="input-group"><label for="twelvefold-way-dd1p" class="input-group-text math">k! \left\{{n \atop k}\right\}</label><input id="twelvefold-way-dd1p" :value="twelvefoldWayDD1p" type="text" class="form-control font-monospace" readonly></div></div></td>
+            </tr>
+            <tr>
+              <th>区別する</th><th>区別しない</th>
+              <td><div class="input-group"><label for="twelvefold-way-du01" class="input-group-text math">{_k}{\rm C}{_n}</label><input id="twelvefold-way-du01" :value="twelvefoldWayDU01" type="text" class="form-control font-monospace" readonly></div></td>
+              <td><div class="input-group"><label for="twelvefold-way-du" class="input-group-text math">{_k}{\rm H}{_n}</label><input id="twelvefold-way-du" :value="twelvefoldWayDU" type="text" class="form-control font-monospace" readonly></div></td>
+              <td><div class="input-group"><label for="twelvefold-way-du1p" class="input-group-text math">{_{k - 1}}{\rm C}{_{n - 1}}</label><input id="twelvefold-way-du1p" :value="twelvefoldWayDU1p" type="text" class="form-control font-monospace" readonly></div></td>
+            </tr>
+            <tr>
+              <th>区別しない</th><th>区別する</th>
+              <td><div class="input-group"><label for="twelvefold-way-ud01" class="input-group-text math">k \ge n</label><input id="twelvefold-way-ud01" :value="twelvefoldWayUD01" type="text" class="form-control font-monospace" readonly></div></td>
+              <td><div class="input-group"><label for="twelvefold-way-ud" class="input-group-text math">B(n, k)</label><input id="twelvefold-way-ud" :value="twelvefoldWayUD" type="text" class="form-control font-monospace" readonly></div></td>
+              <td><div class="input-group"><label for="twelvefold-way-ud1p" class="input-group-text math">\left\{{n \atop k}\right\}</label><input id="twelvefold-way-ud1p" :value="twelvefoldWayUD1p" type="text" class="form-control font-monospace" readonly></div></td>
+            </tr>
+            <tr>
+              <th>区別しない</th><th>区別しない</th>
+              <td><div class="input-group"><label for="twelvefold-way-uu01" class="input-group-text math">k \ge n</label><input id="twelvefold-way-uu01" :value="twelvefoldWayUU01" type="text" class="form-control font-monospace" readonly></div></td>
+              <td><div class="input-group"><label for="twelvefold-way-uu" class="input-group-text math">p_k(n)</label><input id="twelvefold-way-uu" :value="twelvefoldWayUU" type="text" class="form-control font-monospace" readonly></div></td>
+              <td><div class="input-group"><label for="twelvefold-way-uu1p" class="input-group-text math">p_k(n - k)</label><input id="twelvefold-way-uu1p" :value="twelvefoldWayUU1p" type="text" class="form-control font-monospace" readonly></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </fieldset>
+
       <div class="row">
         <fieldset class="col-12 col-md-6">
           <legend>累乗</legend>
@@ -185,50 +229,6 @@
               <input id="stirling2ndFact" :value="stirling2ndFact" type="text" class="form-control font-monospace" readonly>
             </div>
           </div>
-        </fieldset>
-
-        <fieldset class="col-12">
-          <legend>写像12相</legend>
-          <p class="text-math">$k$ 個の箱に $n$ 個のボールを入れる場合の数。箱を区別するか、ボールを区別するか、箱に入るボールの個数が $0, 1$ か $1$ 個以上か制限なしかで $12$ 種類ある。</p>
-          <div class="mb-3">
-            <div class="input-group">
-              <label for="twelvefold-way-k" class="input-group-text math">k = </label>
-              <input id="twelvefold-way-k" v-model="twelvefoldWayKText" type="text" class="form-control font-monospace">
-              <label for="twelvefold-way-n" class="input-group-text math">n = </label>
-              <input id="twelvefold-way-n" v-model="twelvefoldWayNText" type="text" class="form-control font-monospace">
-            </div>
-          </div>
-          <table class="table">
-            <thead>
-              <tr><th>箱</th><th>ボール</th><th class="math">0, 1</th><th>制限なし</th><th class="text-math">$1$ 個以上</th></tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th>区別する</th><th>区別する</th>
-                <td><div class="input-group"><label for="twelvefold-way-dd01" class="input-group-text math">{_k}{\rm P}{_n}</label><input id="twelvefold-way-dd01" :value="twelvefoldWayDD01" type="text" class="form-control font-monospace" readonly></div></td>
-                <td><div class="input-group"><label for="twelvefold-way-dd" class="input-group-text math">k^n</label><input id="twelvefold-way-dd" :value="twelvefoldWayDD" type="text" class="form-control font-monospace" readonly></div></td>
-                <td><div class="input-group"><label for="twelvefold-way-dd1p" class="input-group-text math">k! \left\{{n \atop k}\right\}</label><input id="twelvefold-way-dd1p" :value="twelvefoldWayDD1p" type="text" class="form-control font-monospace" readonly></div></div></td>
-              </tr>
-              <tr>
-                <th>区別する</th><th>区別しない</th>
-                <td><div class="input-group"><label for="twelvefold-way-du01" class="input-group-text math">{_k}{\rm C}{_n}</label><input id="twelvefold-way-du01" :value="twelvefoldWayDU01" type="text" class="form-control font-monospace" readonly></div></td>
-                <td><div class="input-group"><label for="twelvefold-way-du" class="input-group-text math">{_k}{\rm H}{_n}</label><input id="twelvefold-way-du" :value="twelvefoldWayDU" type="text" class="form-control font-monospace" readonly></div></td>
-                <td><div class="input-group"><label for="twelvefold-way-du1p" class="input-group-text math">{_{k - 1}}{\rm C}{_{n - 1}}</label><input id="twelvefold-way-du1p" :value="twelvefoldWayDU1p" type="text" class="form-control font-monospace" readonly></div></td>
-              </tr>
-              <tr>
-                <th>区別しない</th><th>区別する</th>
-                <td><div class="input-group"><label for="twelvefold-way-ud01" class="input-group-text math">k \ge n</label><input id="twelvefold-way-ud01" :value="twelvefoldWayUD01" type="text" class="form-control font-monospace" readonly></div></td>
-                <td><div class="input-group"><label for="twelvefold-way-ud" class="input-group-text math">B(n, k)</label><input id="twelvefold-way-ud" :value="twelvefoldWayUD" type="text" class="form-control font-monospace" readonly></div></td>
-                <td><div class="input-group"><label for="twelvefold-way-ud1p" class="input-group-text math">\left\{{n \atop k}\right\}</label><input id="twelvefold-way-ud1p" :value="twelvefoldWayUD1p" type="text" class="form-control font-monospace" readonly></div></td>
-              </tr>
-              <tr>
-                <th>区別しない</th><th>区別しない</th>
-                <td><div class="input-group"><label for="twelvefold-way-uu01" class="input-group-text math">k \ge n</label><input id="twelvefold-way-uu01" :value="twelvefoldWayUU01" type="text" class="form-control font-monospace" readonly></div></td>
-                <td><div class="input-group"><label for="twelvefold-way-uu" class="input-group-text math">p_k(n)</label><input id="twelvefold-way-uu" :value="twelvefoldWayUU" type="text" class="form-control font-monospace" readonly></div></td>
-                <td><div class="input-group"><label for="twelvefold-way-uu1p" class="input-group-text math">p_k(n - k)</label><input id="twelvefold-way-uu1p" :value="twelvefoldWayUU1p" type="text" class="form-control font-monospace" readonly></div></td>
-              </tr>
-            </tbody>
-          </table>
         </fieldset>
       </div>
     </form>
