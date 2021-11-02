@@ -12,109 +12,146 @@
   </head>
   <body>
     <form id="app" class="container">
-      <fieldset>
-        <legend>設定</legend>
-        <div class="input-group mb-3">
-          <div class="input-group-text">
-            <div class="form-check">
-              <input id="use-modulus" v-model="useModulus" type="checkbox" class="form-check-input">
+      <div class="row">
+        <fieldset class="col-12">
+          <legend>設定</legend>
+          <div class="input-group mb-3">
+            <div class="input-group-text">
+              <div class="form-check">
+                <input id="use-modulus" v-model="useModulus" type="checkbox" class="form-check-input">
+              </div>
+              <label for="use-modulus">MOD</label>
             </div>
-            <label for="use-modulus">MOD</label>
+            <input id="modulus" v-model="modulusText" list="modulo" :disabled="!useModulus" type="text" class="form-control font-monospace">
           </div>
-          <input id="modulus" v-model="modulusText" list="modulo" :disabled="!useModulus" type="text" class="form-control font-monospace">
-        </div>
-      </fieldset>
-
-      <div class="mb-3">
-        <label class="form-label text-math">累乗・重複順列: $O(\log r)$</label>
-        <div class="input-group">
-          <label for="power-n" class="input-group-text math">n = </label>
-          <input id="power-n" v-model="powerNText" type="text" class="form-control font-monospace">
-          <label for="power-r" class="input-group-text math">r = </label>
-          <input id="power-r" v-model="powerRText" type="text" class="form-control font-monospace">
-          <label for="power" class="input-group-text math">n^r = </label>
-          <input id="power" :value="power" type="text" class="form-control font-monospace" readonly>
-        </div>
+        </fieldset>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label text-math">階乗: $O(n)$</label>
-        <div class="input-group">
-          <label for="factorial-n" class="input-group-text math">n = </label>
-          <input id="factorial-n" v-model="factorialNText" type="text" class="form-control font-monospace">
-          <label for="factorial" class="input-group-text math">n! = </label>
-          <input id="factorial" :value="factorial" type="text" class="form-control font-monospace" readonly>
-        </div>
-      </div>
+      <div class="row">
+        <fieldset class="col-12 col-md-6">
+          <legend>累乗</legend>
+          <div class="mb-3">
+            <label class="form-label text-math">$n^r$ 累乗・重複順列: $O(\log r)$</label>
+            <div class="input-group">
+              <label for="power-n" class="input-group-text math">n = </label>
+              <input id="power-n" v-model="powerNText" type="text" class="form-control font-monospace">
+              <label for="power-r" class="input-group-text math">r = </label>
+              <input id="power-r" v-model="powerRText" type="text" class="form-control font-monospace">
+              <label for="power" class="input-group-text math">n^r = </label>
+              <input id="power" :value="power" type="text" class="form-control font-monospace" readonly>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label text-math">$n^{-1}$ 逆元: $O(\log r)$</label>
+            <div class="input-group">
+              <label for="inv-n" class="input-group-text math">n = </label>
+              <input id="inv-n" v-model="invNText" type="text" class="form-control font-monospace">
+              <label for="inv" class="input-group-text math">n^{-1} = </label>
+              <input id="inv" :value="inv" type="text" class="form-control font-monospace" readonly>
+            </div>
+          </div>
+        </fieldset>
 
-      <div class="mb-3">
-        <label class="form-label text-math">順列: $O(r)$</label>
-        <div class="input-group">
-          <label for="permutation-n" class="input-group-text math">n = </label>
-          <input id="permutation-n" v-model="permutationNText" type="text" class="form-control font-monospace">
-          <label for="permutation-r" class="input-group-text math">r = </label>
-          <input id="permutation-r" v-model="permutationRText" type="text" class="form-control font-monospace">
-          <label for="permutation" class="input-group-text math">{_n}{\rm P}{_r} = </label>
-          <input id="permutation" :value="permutation" type="text" class="form-control font-monospace" readonly>
-        </div>
-      </div>
+        <fieldset class="col-12 col-md-6">
+          <legend>階乗</legend>
+          <div class="mb-3">
+            <label class="form-label text-math">$n!$ 階乗: $O(n)$</label>
+            <div class="input-group">
+              <label for="factorial-n" class="input-group-text math">n = </label>
+              <input id="factorial-n" v-model="factorialNText" type="text" class="form-control font-monospace">
+              <label for="factorial" class="input-group-text math">n! = </label>
+              <input id="factorial" :value="factorial" type="text" class="form-control font-monospace" readonly>
+            </div>
+          </div>
 
-      <div class="mb-3">
-        <label class="form-label text-math">二項係数・組合せ: $O(r)$</label>
-        <div class="input-group">
-          <label for="binomial-n" class="input-group-text math">n = </label>
-          <input id="binomial-n" v-model="binomialNText" type="text" class="form-control font-monospace">
-          <label for="binomial-r" class="input-group-text math">r = </label>
-          <input id="binomial-r" v-model="binomialRText" type="text" class="form-control font-monospace">
-          <label for="binomial" class="input-group-text math">{_n}{\rm C}{_r} = </label>
-          <input id="binomial" :value="binomial" type="text" class="form-control font-monospace" readonly>
-        </div>
-      </div>
+          <div class="mb-3">
+            <label class="form-label text-math">${_n}{\rm P}{_r}$ 順列: $O(r)$</label>
+            <div class="input-group">
+              <label for="permutation-n" class="input-group-text math">n = </label>
+              <input id="permutation-n" v-model="permutationNText" type="text" class="form-control font-monospace">
+              <label for="permutation-r" class="input-group-text math">r = </label>
+              <input id="permutation-r" v-model="permutationRText" type="text" class="form-control font-monospace">
+              <label for="permutation" class="input-group-text math">{_n}{\rm P}{_r} = </label>
+              <input id="permutation" :value="permutation" type="text" class="form-control font-monospace" readonly>
+            </div>
+          </div>
 
-      <div class="mb-3">
-        <label class="form-label text-math">重複組合せ: $O(r)$</label>
-        <div class="input-group">
-          <label for="homo-n" class="input-group-text math">n = </label>
-          <input id="homo-n" v-model="homoNText" type="text" class="form-control font-monospace">
-          <label for="homo-r" class="input-group-text math">r = </label>
-          <input id="homo-r" v-model="homoRText" type="text" class="form-control font-monospace">
-          <label for="homo" class="input-group-text math">{_n}{\rm H}{_r} = </label>
-          <input id="homo" :value="homo" type="text" class="form-control font-monospace" readonly>
-        </div>
-      </div>
+          <div class="mb-3">
+            <label class="form-label text-math">${_n}{\rm C}{_r}$ 二項係数・組合せ: $O(r)$</label>
+            <div class="input-group">
+              <label for="binomial-n" class="input-group-text math">n = </label>
+              <input id="binomial-n" v-model="binomialNText" type="text" class="form-control font-monospace">
+              <label for="binomial-r" class="input-group-text math">r = </label>
+              <input id="binomial-r" v-model="binomialRText" type="text" class="form-control font-monospace">
+              <label for="binomial" class="input-group-text math">{_n}{\rm C}{_r} = </label>
+              <input id="binomial" :value="binomial" type="text" class="form-control font-monospace" readonly>
+            </div>
+          </div>
 
-      <div class="mb-3">
-        <label class="form-label text-math">分割数（正整数 $n$ を $1$ 個以上の正整数の和で表す方法の数）: $O(n^2)$</label>
-        <div class="input-group">
-          <label for="partition-n" class="input-group-text math">n = </label>
-          <input id="partition-n" v-model="partitionNText" type="text" class="form-control font-monospace">
-          <label for="partition" class="input-group-text math">p(n) = </label>
-          <input id="partition" :value="partition" type="text" class="form-control font-monospace" readonly>
-        </div>
-      </div>
+          <div class="mb-3">
+            <label class="form-label text-math">${_n}{\rm H}{_r}$重複組合せ: $O(r)$</label>
+            <div class="input-group">
+              <label for="homo-n" class="input-group-text math">n = </label>
+              <input id="homo-n" v-model="homoNText" type="text" class="form-control font-monospace">
+              <label for="homo-r" class="input-group-text math">r = </label>
+              <input id="homo-r" v-model="homoRText" type="text" class="form-control font-monospace">
+              <label for="homo" class="input-group-text math">{_n}{\rm H}{_r} = </label>
+              <input id="homo" :value="homo" type="text" class="form-control font-monospace" readonly>
+            </div>
+          </div>
+        </fieldset>
 
-      <div class="mb-3">
-        <label class="form-label text-math">正整数 $n$ を $k$ 個の正整数の和で表す方法の数: $O(nk)$</label>
-        <div class="input-group">
-          <label for="partition2-n" class="input-group-text math">n = </label>
-          <input id="partition2-n" v-model="partition2NText" type="text" class="form-control font-monospace">
-          <label for="partition2-k" class="input-group-text math">k = </label>
-          <input id="partition2-k" v-model="partition2KText" type="text" class="form-control font-monospace">
-          <label for="partition2" class="input-group-text math">p_k(n) = </label>
-          <input id="partition2" :value="partition2" type="text" class="form-control font-monospace" readonly>
-        </div>
-      </div>
+        <fieldset class="col-12 col-md-6">
+          <legend>分割数</legend>
+          <div class="mb-3">
+            <label class="form-label text-math">$p(n)$ 分割数（正整数 $n$ を $1$ 個以上の正整数の和で表す方法の数）: $O(n^2)$</label>
+            <div class="input-group">
+              <label for="partition-n" class="input-group-text math">n = </label>
+              <input id="partition-n" v-model="partitionNText" type="text" class="form-control font-monospace">
+              <label for="partition" class="input-group-text math">p(n) = </label>
+              <input id="partition" :value="partition" type="text" class="form-control font-monospace" readonly>
+            </div>
+          </div>
 
-      <div class="mb-3">
-        <label class="form-label text-math">正整数 $n$ を $k$ 個<strong>以下</strong>の正整数の和で表す方法の数: $O(nk)$</label>
-        <div class="input-group">
-          <label for="partition2le-n" class="input-group-text math">n = </label>
-          <input id="partition2le-n" v-model="partition2leNText" type="text" class="form-control font-monospace">
-          <label for="partition2le-k" class="input-group-text math">k = </label>
-          <input id="partition2le-k" v-model="partition2leKText" type="text" class="form-control font-monospace">
-          <label for="partition2le" class="input-group-text math">p_{\le k}(n) = </label>
-          <input id="partition2le" :value="partition2le" type="text" class="form-control font-monospace" readonly>
-        </div>
+          <div class="mb-3">
+            <label class="form-label text-math">$p_k(n)$ 正整数 $n$ を $k$ 個の正整数の和で表す方法の数: $O(nk)$</label>
+            <div class="input-group">
+              <label for="partition2-n" class="input-group-text math">n = </label>
+              <input id="partition2-n" v-model="partition2NText" type="text" class="form-control font-monospace">
+              <label for="partition2-k" class="input-group-text math">k = </label>
+              <input id="partition2-k" v-model="partition2KText" type="text" class="form-control font-monospace">
+              <label for="partition2" class="input-group-text math">p_k(n) = </label>
+              <input id="partition2" :value="partition2" type="text" class="form-control font-monospace" readonly>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label text-math">$p_{\le k}(n)$ 正整数 $n$ を $k$ 個<strong>以下</strong>の正整数の和で表す方法の数: $O(nk)$</label>
+            <div class="input-group">
+              <label for="partition2le-n" class="input-group-text math">n = </label>
+              <input id="partition2le-n" v-model="partition2leNText" type="text" class="form-control font-monospace">
+              <label for="partition2le-k" class="input-group-text math">k = </label>
+              <input id="partition2le-k" v-model="partition2leKText" type="text" class="form-control font-monospace">
+              <label for="partition2le" class="input-group-text math">p_{\le k}(n) = </label>
+              <input id="partition2le" :value="partition2le" type="text" class="form-control font-monospace" readonly>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="col-12 col-md-6">
+          <legend>ベル数</legend>
+          <div class="mb-3">
+            <label class="form-label text-math">$B(n, k)$ ベル数（区別できる $n$ 個のボールを区別できない $k$ 個以下の箱に分割する場合の数）: $O(\min(n, k) \log n)$</label>
+            <div class="input-group">
+              <label for="bell-n" class="input-group-text math">n = </label>
+              <input id="bell-n" v-model="bellNText" type="text" class="form-control font-monospace">
+              <label for="bell-k" class="input-group-text math">k = </label>
+              <input id="bell-k" v-model="bellKText" type="text" class="form-control font-monospace">
+              <label for="bell" class="input-group-text math">B(n, k) = </label>
+              <input id="bell" :value="bell" type="text" class="form-control font-monospace" readonly>
+            </div>
+          </div>
+        </fieldset>
       </div>
     </form>
 
@@ -185,8 +222,13 @@ function watchers(watchers) {
 }
 
 function mod(n) {
-  if (app.useModulus) return n % app.modulus;
+  if (app.useModulus) return (n % app.modulus + app.modulus) % app.modulus;
   return n;
+}
+
+function div(a, b) {
+  if (app.useModulus) return a * inv(b) % app.modulus;
+  return a / b;
 }
 
 function power(n, r) {
@@ -200,6 +242,26 @@ function power(n, r) {
     r >>= 1n;
   }
   return x;
+}
+
+function inv(n) {
+  if (!app.useModulus) return 1n / n;
+  return inv_gcd(n, app.modulus)[1];
+}
+
+function inv_gcd(a, b) {
+  a %= b;
+  let [s, t] = [b, a];
+  let [m0, m1] = [0n, 1n];
+  while (t > 0n) {
+    let u = s / t;
+    s -= t * u;
+    m0 -= m1 * u;
+    [s, t] = [t, s];
+    [m0, m1] = [m1, m0];
+  }
+  if (m0 < 0n) m0 += b / s;
+  return [s, m0];
 }
 
 function permutation(n, r) {
@@ -222,20 +284,48 @@ function binomial(n, r) {
 // 正整数 N を K 個以下の非負整数で表す方法の数
 function part(N, K) {
   const P = new Array(N + 1);
-  for (let n = 0; n <= N; n++) {
+  for (let n = 0n; n <= N; n++) {
     P[n] = new Array(K + 1).fill(0n);
   }
   P[0][0] = 1n;
-  for (let n = 0; n <= N; n++) {
-    for (let k = 1; k <= K; k++) {
+  for (let n = 0n; n <= N; n++) {
+    for (let k = 1n; k <= K; k++) {
       if (n >= k) {
-        P[n][k] = mod(P[n][k - 1] + P[n - k][k]);
+        P[n][k] = mod(P[n][k - 1n] + P[n - k][k]);
       } else {
-        P[n][k] = P[n][k - 1];
+        P[n][k] = P[n][k - 1n];
       }
     }
   }
   return P;
+}
+
+function Combination(n) {
+  this.fact = [1n, 1n];
+  this.rfact = [1n, 1n];
+  this.inv = [, 1n];
+  for (let i = 2n; i <= n; i++) {
+    this.fact[i] = mod(this.fact[i - 1n] * i);
+    this.inv[i] = app.modulus - this.inv[app.modulus % i] * (app.modulus / i) % app.modulus;
+    this.rfact[i] = mod(this.rfact[i - 1n] * this.inv[i]);
+  }
+}
+
+// ベル数
+function bell(n, k) {
+  if (n == 0n) return 1n;
+  if (k > n) k = n;
+  const com = new Combination(k);
+  let ret = 0n;
+  const pref = [1n];
+  for (let i = 1n; i <= k; i++) {
+    if ((i & 1n) != 0n) pref[i] = mod(pref[i - 1n] - com.rfact[i]);
+    else pref[i] = mod(pref[i - 1n] + com.rfact[i]);
+  }
+  for (let i = 1n; i <= k; i++) {
+    ret += mod(power(i, n) * com.rfact[i]) * pref[k - i];
+  }
+  return mod(ret);
 }
 
 const app = new Vue({
@@ -246,6 +336,8 @@ const app = new Vue({
     powerNText: "0",
     powerRText: "0",
     power: 1n,
+    invNText: "1",
+    inv: 1n,
     factorialNText: "0",
     factorial: 1n,
     binomialNText: "0",
@@ -265,11 +357,15 @@ const app = new Vue({
     partition2leNText: "0",
     partition2leKText: "0",
     partition2le: 1n,
+    bellNText: "0",
+    bellKText: "0",
+    bell: 1n,
   },
   computed: {
     modulus: propBigInt("modulusText"),
     powerN: propBigInt("powerNText"),
     powerR: propBigInt("powerRText"),
+    invN: propBigInt("invNText"),
     factorialN: propBigInt("factorialNText"),
     binomialN: propBigInt("binomialNText"),
     binomialR: propBigInt("binomialRText"),
@@ -282,6 +378,8 @@ const app = new Vue({
     partition2K: propBigInt("partition2KText"),
     partition2leN: propBigInt("partition2leNText"),
     partition2leK: propBigInt("partition2leKText"),
+    bellN: propBigInt("bellNText"),
+    bellK: propBigInt("bellKText"),
   },
   watch: watchers({
     power: {
@@ -290,6 +388,13 @@ const app = new Vue({
         const n = this.powerN;
         const r = this.powerR;
         return power(n, r);
+      },
+    },
+    inv: {
+      sensitive: ["useModulus", "modulus", "invN"],
+      update() {
+        const n = this.invN;
+        return inv(n);
       },
     },
     factorial: {
@@ -326,7 +431,7 @@ const app = new Vue({
     partition: {
       sensitive: ["useModulus", "modulus", "partitionN"],
       update() {
-        const n = parseInt(this.partitionN);
+        const n = this.partitionN;
         const P = part(n, n);
         return mod(P[n][n]);
       },
@@ -334,20 +439,28 @@ const app = new Vue({
     partition2: {
       sensitive: ["useModulus", "modulus", "partition2N", "partition2K"],
       update() {
-        const n = parseInt(this.partition2N);
-        const k = parseInt(this.partition2K);
-        if (k == 0) return n == 0 ? 1n : 0n;
+        const n = this.partition2N;
+        const k = this.partition2K;
+        if (k == 0n) return n == 0n ? 1n : 0n;
         const P = part(n, k);
-        return mod(P[n][k] - P[n][k - 1]);
+        return mod(P[n][k] - P[n][k - 1n]);
       },
     },
     partition2le: {
       sensitive: ["useModulus", "modulus", "partition2leN", "partition2leK"],
       update() {
-        const n = parseInt(this.partition2N);
-        const k = parseInt(this.partition2K);
+        const n = this.partition2N;
+        const k = this.partition2K;
         const P = part(n, k);
         return P[n][k];
+      },
+    },
+    bell: {
+      sensitive: ["useModulus", "modulus", "bellN", "bellK"],
+      update() {
+        const n = this.bellN;
+        const k = this.bellK;
+        return bell(n, k);
       },
     },
   }),
