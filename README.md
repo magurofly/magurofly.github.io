@@ -21,6 +21,7 @@
 - その他のツール
   - [競プロ検索🔍](https://magurofly.github.io/tools/search)
   - [MOD Calculator](https://magurofly.github.io/tools/modcal)
+  - [Combinatorics Calculator](https://magurofly.github.io/tools/comcal)
   - [ソートなぞなぞヘルパー](https://magurofly.github.io/tools/sort-helper)
 - おもちゃ
   - [オムペンさんのツイートを参考に作った時計](https://magurofly.github.io/toys/clock)
