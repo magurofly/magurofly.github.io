@@ -283,9 +283,9 @@ function binomial(n, r) {
 
 // 正整数 N を K 個以下の非負整数で表す方法の数
 function part(N, K) {
-  const P = new Array(N + 1);
+  const P = [];
   for (let n = 0n; n <= N; n++) {
-    P[n] = new Array(K + 1).fill(0n);
+    P[n] = [];
   }
   P[0][0] = 1n;
   for (let n = 0n; n <= N; n++) {
