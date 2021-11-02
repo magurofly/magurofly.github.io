@@ -114,6 +114,13 @@ function part(N, K) {
   return P;
 }
 
+function partition(n, k) {
+  if (n < k) return 0n;
+  if (k == 0n) return n == 0n ? 1n : 0n;
+  const P = part(n, k);
+  return mod(P[n][k] - P[n][k - 1n]);
+}
+
 class Combination {
   constructor(n) {
     this.fact = [1n, 1n];
@@ -200,6 +207,23 @@ const app = new Vue({
     stirling2ndNText: "0",
     stirling2ndKText: "0",
     stirling2nd: 1n,
+    stirling2ndFactNText: "0",
+    stirling2ndFactKText: "0",
+    stirling2ndFact: 1n,
+    twelvefoldWayNText: "0",
+    twelvefoldWayKText: "0",
+    twelvefoldWayUU01: 1n,
+    twelvefoldWayUU: 1n,
+    twelvefoldWayUU1p: 1n,
+    twelvefoldWayUD01: 1n,
+    twelvefoldWayUD: 1n,
+    twelvefoldWayUD1p: 1n,
+    twelvefoldWayDU01: 1n,
+    twelvefoldWayDU: 1n,
+    twelvefoldWayDU1p: 1n,
+    twelvefoldWayDD01: 1n,
+    twelvefoldWayDD: 1n,
+    twelvefoldWayDD1p: 1n,
   },
   computed: {
     modulus: propBigInt("modulusText"),
@@ -223,6 +247,10 @@ const app = new Vue({
     bell2K: propBigInt("bell2KText"),
     stirling2ndN: propBigInt("stirling2ndNText"),
     stirling2ndK: propBigInt("stirling2ndKText"),
+    stirling2ndFactN: propBigInt("stirling2ndFactNText"),
+    stirling2ndFactK: propBigInt("stirling2ndFactKText"),
+    twelvefoldWayK: propBigInt("twelvefoldWayKText"),
+    twelvefoldWayN: propBigInt("twelvefoldWayNText"),
   },
   watch: watchers({
     power: {
@@ -284,9 +312,7 @@ const app = new Vue({
       update() {
         const n = this.partition2N;
         const k = this.partition2K;
-        if (k == 0n) return n == 0n ? 1n : 0n;
-        const P = part(n, k);
-        return mod(P[n][k] - P[n][k - 1n]);
+        return partition(n, k);
       },
     },
     partition2le: {
@@ -320,6 +346,110 @@ const app = new Vue({
         const k = this.stirling2ndK;
         return stirling2nd(n, k);
       },
-    }
+    },
+    stirling2ndFact: {
+      sensitive: ["useModulus", "modulus", "stirling2ndFactN", "stirling2ndFactK"],
+      update() {
+        const n = this.stirling2ndFactN;
+        const k = this.stirling2ndFactK;
+        return mod(permutation(k, k) * stirling2nd(n, k));
+      },
+    },
+    twelvefoldWayDD01: {
+      sensitive: ["useModulus", "modulus", "twelvefoldWayK", "twelvefoldWayN"],
+      update() {
+        const k = this.twelvefoldWayK;
+        const n = this.twelvefoldWayN;
+        return permutation(k, n);
+      },
+    },
+    twelvefoldWayDD: {
+      sensitive: ["useModulus", "modulus", "twelvefoldWayK", "twelvefoldWayN"],
+      update() {
+        const k = this.twelvefoldWayK;
+        const n = this.twelvefoldWayN;
+        return power(k, n);
+      },
+    },
+    twelvefoldWayDD1p: {
+      sensitive: ["useModulus", "modulus", "twelvefoldWayK", "twelvefoldWayN"],
+      update() {
+        const k = this.twelvefoldWayK;
+        const n = this.twelvefoldWayN;
+        return mod(permutation(k, k) * stirling2nd(n, k));
+      },
+    },
+    twelvefoldWayDU01: {
+      sensitive: ["useModulus", "modulus", "twelvefoldWayK", "twelvefoldWayN"],
+      update() {
+        const k = this.twelvefoldWayK;
+        const n = this.twelvefoldWayN;
+        return binomial(k, n);
+      },
+    },
+    twelvefoldWayDU: {
+      sensitive: ["useModulus", "modulus", "twelvefoldWayK", "twelvefoldWayN"],
+      update() {
+        const k = this.twelvefoldWayK;
+        const n = this.twelvefoldWayN;
+        return binomial(k + n - 1n, n);
+      },
+    },
+    twelvefoldWayDU1p: {
+      sensitive: ["useModulus", "modulus", "twelvefoldWayK", "twelvefoldWayN"],
+      update() {
+        const k = this.twelvefoldWayK;
+        const n = this.twelvefoldWayN;
+        return binomial(n - 1n, k - 1n);
+      },
+    },
+    twelvefoldWayUD01: {
+      sensitive: ["useModulus", "modulus", "twelvefoldWayK", "twelvefoldWayN"],
+      update() {
+        const k = this.twelvefoldWayK;
+        const n = this.twelvefoldWayN;
+        return (k >= n) ? 1n : 0n;
+      },
+    },
+    twelvefoldWayUD: {
+      sensitive: ["useModulus", "modulus", "twelvefoldWayK", "twelvefoldWayN"],
+      update() {
+        const k = this.twelvefoldWayK;
+        const n = this.twelvefoldWayN;
+        return bell(n, k);
+      },
+    },
+    twelvefoldWayUD1p: {
+      sensitive: ["useModulus", "modulus", "twelvefoldWayK", "twelvefoldWayN"],
+      update() {
+        const k = this.twelvefoldWayK;
+        const n = this.twelvefoldWayN;
+        return stirling2nd(n, k);
+      },
+    },
+    twelvefoldWayUU01: {
+      sensitive: ["useModulus", "modulus", "twelvefoldWayK", "twelvefoldWayN"],
+      update() {
+        const k = this.twelvefoldWayK;
+        const n = this.twelvefoldWayN;
+        return (k >= n) ? 1n : 0n;
+      },
+    },
+    twelvefoldWayUU: {
+      sensitive: ["useModulus", "modulus", "twelvefoldWayK", "twelvefoldWayN"],
+      update() {
+        const k = this.twelvefoldWayK;
+        const n = this.twelvefoldWayN;
+        return partition(n, k);
+      },
+    },
+    twelvefoldWayUU1p: {
+      sensitive: ["useModulus", "modulus", "twelvefoldWayK", "twelvefoldWayN"],
+      update() {
+        const k = this.twelvefoldWayK;
+        const n = this.twelvefoldWayN;
+        return partition(n - k, k);
+      },
+    },
   }),
 });
