@@ -148,9 +148,17 @@ for (const el of document.querySelectorAll(".text-math")) {
   });
 }
 
+const toBigInt = n => {
+  try {
+    return toBigInt(n);
+  } catch (e) {
+    return 0n;
+  }
+};
+
 const propBigInt = (prop) => ({
   get() {
-    return BigInt(this[prop]);
+    return toBigInt(this[prop]);
   },
   set(n) {
     this[prop] = n.toString();
