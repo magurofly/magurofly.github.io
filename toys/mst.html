@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis-network.min.css" integrity="sha512-NJXM8vzWgDcBy9SCUTJXYnNO43sZV3pfLWWZMFTuCtEUIOcznk+AMpH6N3XruxavYfMeMmjrzDMEQ6psRh/6Hw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <title>最小全域木</title>
+  </head>
+  <body>
+
+    <div class="container">
+      <div class="row">
+        <!-- コントロール -->
+      </div>
+      <div class="row">
+        <div class="col-12 col-md-6">
+          <div class="row">
+            <div class="col-12">
+              <h2>Prim法</h2>
+              <p>Prim法は、最初に適当な頂点を選び木に入れる。毎ステップでは、木に隣接する頂点であって、接続している辺のコストが最小のものを木に併合する。</p>
+            </div>
+            <div class="col-12">
+              <div class="btn-group" role="group" aria-label="Controls">
+                <button type="button" class="btn btn-primary" id="control-prim-prev"><i class="bi bi-skip-start-fill"></i></button>
+                <button type="button" class="btn btn-primary" id="control-prim-next"><i class="bi bi-skip-end-fill"></i></button>
+              </div>
+              <div id="network-prim" style="height: 50vh"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-6">
+          <div class="row">
+            <div class="col-12">
+              <h2>Kruskal法</h2>
+              <p>Kruskal法は、辺を小さい順に見ていき、閉路ができない場合はその辺を使う。</p>
+            </div>
+            <div class="col-12">
+              <div class="btn-group" role="group" aria-label="Controls">
+                <button type="button" class="btn btn-primary" id="control-kruskal-prev"><i class="bi bi-skip-start-fill"></i></button>
+                <button type="button" class="btn btn-primary" id="control-kruskal-next"><i class="bi bi-skip-end-fill"></i></button>
+              </div>
+              <div id="network-kruskal" style="height: 50vh"></div>
+            </div>
+          </div>
+        </div>
+        <!--div class="col-12 col-md-4">
+          <h2>Borůvka法</h2>
+          <p>Borůvka法は、Prim法を並列に行う方法とみなすことができる。毎ステップでは、それぞれの木について、隣接する木のうち接続している辺のコストが最小のものを木に併合する。</p>
+        </div-->
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <h2>グラフ</h2>
+          <pre><code>N M
+A<sub>1</sub> B<sub>1</sub> C<sub>1</sub>
+...
+A<sub>M</sub> B<sub>M</sub> C<sub>M</sub></code></pre>
+          <textarea id="graph-data" rows="20" cols="50">5 8
+1 2 4
+1 3 5
+1 5 1
+2 3 3
+2 4 2
+3 4 8
+3 5 6
+4 5 7</textarea><button type="button" class="btn btn-primary">設定</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis-network.min.js" integrity="sha512-GE9mKnPrTn2DY5AZuIC9yE6K4FF8T+9lsO7jwHn+RW9rEjnHzF/in0oGwlPzRwjhQ+oJiawmtfvleX+l6h5/cA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+const COLOR_NORMAL = {color:"black", inherit:false};
+const COLOR_LOWLIGHT = {color:"lightgray", inherit:false};
+const COLOR_HIGHLIGHT = {color:"orange", inherit:false};
+
+const clone = (obj) => Object.assign({}, obj);
+
+const SEED = Math.random();
+const network_prim = new vis.Network(document.getElementById("network-prim"), { nodes: [], edges: [] }, { layout: { randomSeed: SEED } });
+const network_kruskal = new vis.Network(document.getElementById("network-kruskal"), { nodes: [], edges: [] }, { layout: { randomSeed: SEED } });
+
+let mst_prim = null;
+let mst_kruskal = null;
+
+function initialize() {
+  const lines = document.getElementById("graph-data").value.split(/\n/);
+  const [N, M] = lines[0].split(/\s/).map(Number);
+  const edges = [];
+  for (let i = 0; i < M; i++) {
+    const [A, B, C] = lines[i + 1].split(/\s/).map(Number);
+    edges.push({ from: A, to: B, label: String(C), cost: C, color: COLOR_NORMAL });
+  }
+
+  mst_prim = new MSTPrim(N, edges);
+  network_prim.setData(mst_prim.draw());
+
+  mst_kruskal = new MSTKruskal(N, edges);
+  network_kruskal.setData(mst_kruskal.draw());
+}
+
+
+class MSTPrim {
+  // @param n_vetices: number
+  // @param edges: { from: number, to: number, value: number }[] (1-based index)
+  constructor(n_vertices, edges) {
+    this.n = n_vertices;
+    this.edges = edges.map((edge, edge_index) => {
+      edge = clone(edge);
+      edge.index = edge_index;
+      return edge;
+    });
+    this.tree_vertices = [0]; // 0-based index
+    this.tree_vertices_set = new Set([0]); // 0-based index
+    this.tree_edges = []; // 0-based index
+    this.nodes = [];
+    for (let i = 1; i <= n_vertices; i++) this.nodes.push({ id: i, label: String(i) });
+  }
+
+  next() {
+    if (this.tree_edges.length == this.n - 1) return false;
+    let edges = this.edges.filter(({ from, to }) => this.tree_vertices_set.has(from - 1) != this.tree_vertices_set.has(to - 1));
+    edges = edges.sort((e, f) => e.cost - f.cost);
+    const edge = edges[0];
+    this.tree_edges.push(edge.index);
+    if (this.tree_vertices_set.has(edge.from - 1)) {
+      this.tree_vertices_set.add(edge.to - 1);
+      this.tree_vertices.push(edge.to - 1);
+    } else {
+      this.tree_vertices_set.add(edge.from - 1);
+      this.tree_vertices.push(edge.from - 1);
+    }
+    return true;
+  }
+
+  prev() {
+    if (this.tree_edges.length == 0) return false;
+    this.tree_edges.pop();
+    this.tree_vertices_set.delete(this.tree_vertices.pop());
+    return true;
+  }
+
+  draw() {
+    const nodes = this.nodes.map(clone);
+    for (const node_index of this.tree_vertices) nodes[node_index].color = COLOR_HIGHLIGHT;
+    const edges = this.edges.map(clone);
+    for (const edge_index of this.tree_edges) edges[edge_index].color = COLOR_HIGHLIGHT;
+    return { edges, nodes };
+  }
+}
+
+class MSTKruskal {
+  constructor(n_vertices, edges) {
+    this.n = n_vertices;
+    this.edges = edges.map(clone);
+    this.edges_sorted = edges.map((_, index) => index);
+    this.edges_sorted.sort((i, j) => this.edges[i].cost - this.edges[j].cost).reverse();
+    this.used_edges = [];
+    this.history = [];
+    this.unionfind = new UndoableUnionFind(n_vertices);
+    this.nodes = [];
+    for (let i = 1; i <= n_vertices; i++) this.nodes.push({ id: i, label: String(i) });
+  }
+
+  next() {
+    if (this.edges_sorted.length == 0) return false;
+    const edge_index = this.edges_sorted.pop();
+    const { from: u, to: v } = this.edges[edge_index];
+    this.used_edges.push([edge_index, this.unionfind.merge(u - 1, v - 1)]);
+    return true;
+  }
+
+  prev() {
+    if (this.used_edges.length == 0) return false;
+    const [edge_index, tree] = this.used_edges.pop();
+    if (tree) this.unionfind.undo();
+    return true;
+  }
+
+  draw() {
+    const nodes = this.nodes.map(clone);
+    const edges = this.edges.map(clone);
+    for (const [edge_index, tree] of this.used_edges) edges[edge_index].color = (tree) ? COLOR_HIGHLIGHT : COLOR_LOWLIGHT;
+    return { edges, nodes };
+  }
+}
+
+class UndoableUnionFind {
+  constructor(n) {
+    this.p = [];
+    for (let i = 0; i < n; i++) this.p[i] = -1;
+    this.history = [];
+  }
+
+  leader(i) {
+    const j = this.p[i];
+    return (j < 0) ? i : this.leader(j);
+  }
+
+  merge(i, j) {
+    i = this.leader(i);
+    j = this.leader(j);
+    if (i == j) return false;
+    if (-this.p[i] < -this.p[j]) [i, j] = [j, i];
+    this.history.push([[i, this.p[i]], [j, this.p[j]]]);
+    this.p[i] += this.p[j];
+    this.p[j] = i;
+    return true;
+  }
+
+  undo() {
+    if (this.history.length == 0) return false;
+    for (const [i, x] of this.history.pop()) this.p[i] = x;
+    return true;
+  }
+}
+
+initialize();
+
+document.getElementById("control-prim-prev").addEventListener("click", () => {
+  mst_prim.prev();
+  network_prim.setData(mst_prim.draw());
+});
+document.getElementById("control-prim-next").addEventListener("click", () => {
+  mst_prim.next();
+  network_prim.setData(mst_prim.draw());
+});
+
+document.getElementById("control-kruskal-prev").addEventListener("click", () => {
+  mst_kruskal.prev();
+  network_kruskal.setData(mst_kruskal.draw());
+});
+document.getElementById("control-kruskal-next").addEventListener("click", () => {
+  mst_kruskal.next();
+  network_kruskal.setData(mst_kruskal.draw());
+});
+    </script>
+  </body>
+</html>
