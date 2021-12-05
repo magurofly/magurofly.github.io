@@ -71,7 +71,7 @@ A<sub>M</sub> B<sub>M</sub> C<sub>M</sub></code></pre>
 2 4 2
 3 4 8
 3 5 6
-4 5 7</textarea><button type="button" class="btn btn-primary">設定</button>
+4 5 7</textarea><button type="button" class="btn btn-primary" id="init">設定</button>
         </div>
       </div>
     </div>
@@ -243,6 +243,10 @@ document.getElementById("control-kruskal-prev").addEventListener("click", () => 
 document.getElementById("control-kruskal-next").addEventListener("click", () => {
   mst_kruskal.next();
   network_kruskal.setData(mst_kruskal.draw());
+});
+
+document.getElementById("init").addEventListener("click", () => {
+  initialize();
 });
     </script>
   </body>
