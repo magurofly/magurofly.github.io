@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Holding IME</title>
+
+    <meta name="twitter:card" content="summary">
+    <meta property="og:title" content="Holding IME">
+    <meta property="og:description" content="ひらがな一文字に対してローマ字を同時に押し込み、離すことで確定します">
+<body>
+  <textarea id="area">もじをにゅうりょくしてください</textarea>
+  <style>
+body, #area {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+}
+#area {
+  font-size: 5vw;
+  text-align: left;
+  word-wrap: break-all;
+}
+  </style>
+  <script>
+const textArea = document.querySelector("#area")
+
+const letterMap = new Map(Object.entries({
+  a: "あ", i: "い", u: "う", e: "え", o: "お", "-": "ー",
+  b: "ｂ", c: "ｃ", d: "ｄ", f: "ｆ", g: "ｇ", h: "ｈ", j: "ｊ", k: "ｋ", l: "ｌ", m: "ｍ", n: "ん", p: "ｐ", r: "ｒ", s: "ｓ", t: "っ", v: "ｖ", w: "ｗ", x: "ｘ", y: "ｙ", z: "ｚ",
+  sh: "ｓｈ", ch: "ｃｈ", hs: "ｓｈ", hc: "ｃｈ", xn: "ん", nx: "ん", zy: "ｚｙ", yz: "ｙｚ", ty: "ｔｙ", yt: "ｔｙ",
+  ak: "か", ik: "き", uk: "く", ek: "け", ok: "こ", ka: "か", ki: "き", ku: "く", ke: "け", ko: "こ",
+  ag: "が", ig: "ぎ", ug: "ぐ", eg: "げ", og: "ご", ga: "が", gi: "ぎ", gu: "ぐ", ge: "げ", go: "ご",
+  as: "さ", is: "し", us: "す", es: "せ", os: "そ", sa: "さ", si: "し", su: "す", se: "せ", so: "そ",
+  sha: "しゃ", shi: "し", shu: "しゅ", she: "しぇ", sho: "しょ", hsa: "しゃ", hsi: "し", hsu: "しゅ", hse: "しぇ", hso: "しょ", ahs: "しゃ", ihs: "し", uhs: "しゅ", ehs: "しぇ", ohs: "しょ", has: "しゃ", his: "し", hus: "しゅ", hes: "しぇ", hos: "しょ", ash: "しゃ", ish: "し", ush: "しゅ", esh: "しぇ", osh: "しょ", sah: "しゃ", sih: "し", suh: "しゅ", seh: "しぇ", soh: "しょ",
+  az: "ざ", iz: "じ", uz: "ず", ez: "ぜ", oz: "ぞ", za: "ざ", zi: "じ", zu: "ず", ze: "ぜ", zo: "ぞ",
+  ja: "じゃ", ji: "じ", ju: "じゅ", je: "じぇ", jo: "じょ", aj: "じゃ", ij: "じ", uj: "じゅ", ej: "じぇ", oj: "じょ",
+  zya: "じゃ", zyi: "じ", zyu: "じゅ", zye: "じぇ", zyo: "じょ", ayz: "じゃ", iyz: "じ", uyz: "じゅ", eyz: "じぇ", oyz: "じょ", yaz: "じゃ", yiz: "じ", yuz: "じゅ", yez: "じぇ", yoz: "じょ", yza: "じゃ", yzi: "じ", yzu: "じゅ", yze: "じぇ", yzo: "じょ", azy: "じゃ", izy: "じ", uzy: "じゅ", ezy: "じぇ", ozy: "じょ", zay: "じゃ", ziy: "じ", zuy: "じゅ", zey: "じぇ", zoy: "じょ",
+  at: "た", it: "ち", ut: "つ", et: "て", ot: "と", ta: "た", ti: "ち", tu: "つ", te: "て", to: "と",
+  yat: "ちゃ", yit: "ち", yut: "ちゅ", yet: "ちぇ", yot: "ちょ", yta: "ちゃ", yti: "ち", ytu: "ちゅ", yte: "ちぇ", yto: "ちょ", tya: "ちゃ", tyi: "ち", tyu: "ちゅ", tye: "ちぇ", tyo: "ちょ", ayt: "ちゃ", iyt: "ち", yut: "ちゅ", eyt: "ちぇ", oyt: "ちょ", tay: "ちゃ", tiy: "ち", tuy: "ちゅ", tey: "ちぇ", toy: "ちょ", aty: "ちゃ", ity: "ち", uty: "ちゅ", ety: "ちぇ", oty: "ちょ",
+  ad: "だ", id: "ぢ", ud: "づ", ed: "で", od: "ど", da: "だ", di: "ぢ", du: "づ", de: "で", do: "ど",
+  an: "な", in: "に", un: "ぬ", en: "ね", on: "の", na: "な", ni: "に", nu: "ぬ", ne: "ね", no: "の",
+  ah: "は", ih: "ひ", uh: "ふ", eh: "へ", oh: "ほ", ha: "は", hi: "ひ", fu: "ふ", he: "へ", ho: "ほ",
+  ab: "ば", ib: "び", ub: "ぶ", eb: "べ", ob: "ぼ", ba: "ば", bi: "び", bu: "ぶ", be: "べ", bo: "ぼ",
+  ap: "ぱ", ip: "ぴ", up: "ぷ", ep: "ぺ", op: "ぽ", pa: "ぱ", pi: "ぴ", pu: "ぷ", pe: "ぺ", po: "ぽ",
+  am: "ま", im: "み", um: "む", em: "め", om: "も", ma: "ま", mi: "み", mu: "む", me: "め", mo: "も",
+  ar: "ら", ir: "り", ur: "る", er: "れ", or: "ろ", ra: "ら", ri: "り", ru: "る", re: "れ", ro: "ろ",
+  ay: "や", iy: "い", uy: "ゆ", ey: "いぇ", oy: "よ", ya: "や", yi: "い", yu: "ゆ", ye: "いぇ", yo: "よ",
+  aw: "わ", iw: "うぃ", uw: "う", ew: "うぇ", ow: "お", wa: "わ", wi: "うぃ", we: "うぇ", wo: "を",
+  xt: "っ", tx: "っ"
+}));
+
+// 「か」の入力に関して、「ak」, 「ka」の両方を許容する
+// 「あ」（a）が入力されているとき、まだaが離されていないなら、kを追加で押すことで「か」に変更する
+const pressedKeys = new Set();
+let processingLen = 0;
+let processingLetter = "";
+document.addEventListener("keydown", event => {
+  pressedKeys.add(event.key);
+
+  let used = false;
+
+  if (!used && processingLen != 0 && letterMap.has(processingLetter + event.key)) {
+    const letter = letterMap.get(processingLetter + event.key);
+    textArea.value = textArea.value.slice(0, -processingLen) + letter;
+    processingLen = letter.length;
+    processingLetter += event.key;
+    used = true;
+  }
+  
+  if (!used && letterMap.has(event.key)) {
+    const letter = letterMap.get(event.key);
+    processingLen = letter.length;
+    processingLetter = event.key;
+    textArea.value += letter; 
+  }
+});
+document.addEventListener("keyup", event => {
+  pressedKeys.delete(event.key);
+
+  processingLen = 0;
+});
+document.addEventListener("keypress", event => {
+  event.preventDefault();
+  if (event.key == "backspace") {
+    textArea.value = textArea.value.slice(0, -1);
+  }
+})
+window.addEventListener("blur", () => {
+  pressedKeys.clear();
+});
+  </script>
+</body>
