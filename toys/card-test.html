@@ -2,14 +2,25 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>う　し　た　ぷ　に　き　あ　く　ん　笑</title>
-    <meta name="twitter:card" content="う　し　た　ぷ　に　き　あ　く　ん　笑">
+   <title>う　し　た　ぷ　に　き　あ　く　ん　笑</title>
+    <meta name="twitter:card" content="player">
+    <meta name="twitter:title" content="う　し　た　ぷ　に　き　あ　く　ん　笑">
     <meta name="twitter:site" content="@ei1333">
-    <meta name="twitter:title" content="う　し　た　ぷ　笑">
-    <meta name="twitter:description" content="う笑">
-    <meta name="twitter:image:src" content="https://pbs.twimg.com/media/ErOVu8xVEAEMIBJ?format=png&name=large">
+    <meta name="twitter:description" content="う　し　た　ぷ　に　き　あ　王　国　笑">
+    <meta name="twitter:player" content="https://magurofly.github.io/toys/card-test">
+    <meta name="twitter:player:width" content="360">
+    <meta name="twitter:player:height" content="200">
+    <meta name="twitter:image" content="https://pbs.twimg.com/media/ErOVu8xVEAEMIBJ?format=png&name=large">
   </head>
   <body>
-    <h1 style="display: fixed; font-size: 5vw; width: 100%; text-align: center; height: 5vw; top: 50%; left: 0;">う　し　た　ぷ　に　き　あ　く　ん　笑</h1>
+    <h1 id="gaming" style="display: fixed; font-size: 5vw; width: 100%; text-align: center; height: 5vw; top: 50%; left: 0;">う　し　た　ぷ　に　き　あ　く　ん　笑</h1>
+    <script>
+const h = document.querySelector("#gaming");
+let hue = 0;
+setInterval(() => {
+  h.style.color = `hsl(${hue}, 100%, 50%)`;
+  hue = (hue + 1) % 360;
+}, 30);
+    </script>
   </body>
 </html>
