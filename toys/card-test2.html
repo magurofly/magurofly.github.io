@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Redirect to ...</title>
+    <meta name="twitter:card" content="player">
+    <meta name="twitter:title" content="Card Test">
+    <meta name="twitter:description" content="Redirecting player">
+    <meta name="twitter:player" content="https://magurofly.github.io/toys/card-test2">
+    <meta name="twitter:player:width" content="360">
+    <meta name="twitter:player:height" content="200">
+  </head>
+  <body>
+    <h1>Redirecting...</h1>
+    <script>
+const queries = location.search.slice(1).split("&");
+for (const query of queries) {
+  if (!~query.indexOf("=")) continue;
+  const [key, value] = query.split("=");
+  if (key == "url") {
+    location.href = decodeURIComponent(value);
+  }
+}
+    </script>
+  </body>
+</html>
