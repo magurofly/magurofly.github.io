@@ -10,16 +10,31 @@
     <meta name="twitter:player" content="https://magurofly.github.io/toys/card-test">
     <meta name="twitter:player:width" content="360">
     <meta name="twitter:player:height" content="200">
-    <meta name="twitter:image" content="https://pbs.twimg.com/media/ErOVu8xVEAEMIBJ?format=png&name=large">
+    <meta property="og:image" content="https://pbs.twimg.com/media/ErOVu8xVEAEMIBJ?format=png&name=large">
   </head>
   <body>
-    <h1 id="gaming" style="display: fixed; font-size: 5vw; width: 100%; text-align: center; height: 5vw; top: 50%; left: 0;">う　し　た　ぷ　に　き　あ　く　ん　笑</h1>
+    <h1 id="gaming">う　し　た　ぷ　に　き　あ　く　ん　笑</h1>
+    <style>
+#gaming {
+    display: fixed;
+    font-size: 5vw;
+    width: 100%;
+    text-align: center;
+    height: 30vh;
+    top: 30vh;
+    left: 0;
+    font-weight: 900;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+    </style>
     <script>
 const h = document.querySelector("#gaming");
 let hue = 0;
 setInterval(() => {
-  h.style.color = `hsl(${hue}, 100%, 50%)`;
-  hue = (hue + 1) % 360;
+  h.style.backgroundImage = `linear-gradient(90deg, hsl(${hue}, 100%, 50%), hsl(${(hue + 60) % 360}, 100%, 50%), hsl(${(hue + 120) % 360}, 100%, 50%))`;
+  hue = (hue + 10) % 360;
 }, 30);
     </script>
   </body>
