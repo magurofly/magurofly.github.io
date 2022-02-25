@@ -13,7 +13,7 @@
   <body>
     <h1>Redirecting...</h1>
     <script>
-const queries = location.search.slice(1).split("&");
+const queries = (location.search || location.hash).slice(1).split("&");
 for (const query of queries) {
   if (!~query.indexOf("=")) continue;
   const [key, value] = query.split("=");
