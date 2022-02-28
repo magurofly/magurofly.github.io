@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="twitter:card" content="player">
+    <meta name="twitter:title" content="Untyped Lambda Calculus">
+    <meta name="twitter:description" content="λx.x">
+    <meta name="twitter:player" content="https://magurofly.github.io/toys/lambda/untyped">
+    <meta name="twitter:player:width" content="360">
+    <meta name="twitter:player:height" content="200">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis-network.min.css" integrity="sha512-NJXM8vzWgDcBy9SCUTJXYnNO43sZV3pfLWWZMFTuCtEUIOcznk+AMpH6N3XruxavYfMeMmjrzDMEQ6psRh/6Hw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <title>λ</title>
+  </head>
+  <body class="font-monospace">
+    <div class="container" id="container">
+      <div class="row" id="result" style="max-height: 80vh; overflow-y: auto">
+      </div>
+      <div class="row" id="simpl-container">
+        <div class="col-12">
+          <form>
+            <div class="input-group">
+              <input type="text" class="form-control font-monospace" id="expr" placeholder="(λn. λs. λz. s (n s z)) (λs. λz. s (s z))" value="(λn. λs. λz. s (n s z)) (λs. λz. s (s z))">
+              <button type="button" id="btn-simpl" class="btn btn-primary">simpl</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis-network.min.js" integrity="sha512-GE9mKnPrTn2DY5AZuIC9yE6K4FF8T+9lsO7jwHn+RW9rEjnHzF/in0oGwlPzRwjhQ+oJiawmtfvleX+l6h5/cA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+class Var {
+    constructor(index) {
+      this.index = index;
+    }
+    toString(env = []) {
+      return env[env.length + ~this.index] || `$${this.index}`;
+    }
+  }
+
+  class App {
+    constructor(left, right) {
+      [this.left, this.right] = [left, right];
+    }
+    toString(env = []) {
+      let left = this.left.toString(env);
+      let right = this.right.toString(env);
+      if (this.left instanceof Abs) left = "(" + left + ")";
+      if (this.right instanceof App || this.right instanceof Abs) right = "(" + right + ")";
+      return `${left} ${right}`;
+    }
+  }
+
+  class Abs {
+    constructor(varName, body) {
+      [this.varName, this.body] = [varName, body];
+    }
+    toString(env = []) {
+      env.push(this.varName);
+      const str = this.body.toString(env);
+      env.pop();
+      return `λ${this.varName}. ${str}`;
+    }
+  }
+
+  function assign(expr, index, value) {
+    if (expr instanceof Var) {
+      if (expr.index === index) return value;
+      if (value instanceof Var && expr.index > value.index) return new Var(expr.index - 1);
+      return expr;
+    }
+    if (expr instanceof Abs) {
+      if (value instanceof Var) {
+        return new Abs(expr.varName, assign(expr.body, index + 1, new Var(value.index + 1)));
+      }
+      return new Abs(expr.varName, assign(expr.body, index + 1, value));
+    }
+    if (expr instanceof App) {
+      return new App(assign(expr.left, index, value), assign(expr.right, index, value));
+    }
+    throw new Error("unexpected");
+  }
+
+  function simpl(expr) {
+    let simplified = false;
+    const dfs = expr => {
+      if (simplified) return expr;
+      if (expr instanceof App) {
+        if (expr.left instanceof Abs) {
+          simplified = true;
+          return assign(expr.left.body, 0, expr.right);
+        }
+        let left = dfs(expr.left), right = expr.right;
+        if (!simplified) right = dfs(right);
+        return new App(left, right);
+      }
+      if (expr instanceof Abs) {
+        return new Abs(expr.varName, dfs(expr.body));
+      }
+      return expr;
+    };
+    return dfs(expr);
+  }
+    </script>
+    <script src="./untyped.parser.js"></script>
+    <script>
+const result = document.querySelector("#result");
+const expr = document.querySelector("#expr");
+const btnSimpl = document.querySelector("#btn-simpl");
+
+btnSimpl.onclick = () => {
+  const col = document.createElement("div");
+  col.className = "col-12";
+  result.appendChild(col);
+  try {
+    const parsed = UntypedLambdaParser.parse(expr.value);
+    col.textContent = parsed.toString();
+    const simplified = simpl(parsed);
+    expr.value = simplified.toString();
+  } catch (e) {
+    col.textContent = e.toString();
+    col.style.color = "red";
+  }
+  result.scrollTo(0, result.scrollHeight);
+};
+    </script>
+  </body>
+</html>
