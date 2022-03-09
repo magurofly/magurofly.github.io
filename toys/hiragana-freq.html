@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <title>ひらがな頻度表</title>
+    <meta name="twitter:card" content="summary">
+    <meta name="og:title" content="ひらがな頻度表">
+    <meta name="og:summary" content="五十音表に頻度の情報を付け加えた">
+  </head>
+
+  <body>
+    <table class="table text-center" id="table">
+      <thead>
+        <tr>
+          <th>＼</th>
+          <th>_</th>
+          <th>k</th>
+          <th>g</th>
+          <th>s</th>
+          <th>z</th>
+          <th>t</th>
+          <th>d</th>
+          <th>n</th>
+          <th>h</th>
+          <th>b</th>
+          <th>p</th>
+          <th>m</th>
+          <th>y</th>
+          <th><i>y</i></th>
+          <th>r</th>
+          <th>w</th>
+          <th>_</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>a</th>
+          <td>あ</td>
+          <td>か</td>
+          <td>が</td>
+          <td>さ</td>
+          <td>ざ</td>
+          <td>た</td>
+          <td>だ</td>
+          <td>な</td>
+          <td>は</td>
+          <td>ば</td>
+          <td>ぱ</td>
+          <td>ま</td>
+          <td>や</td>
+          <td>ゃ</td>
+          <td>ら</td>
+          <td>わ</td>
+        </tr>
+      
+        <tr>
+          <th>i</th>
+          <td>い</td>
+          <td>き</td>
+          <td>ぎ</td>
+          <td>し</td>
+          <td>じ</td>
+          <td>ち</td>
+          <td>ぢ</td>
+          <td>に</td>
+          <td>ひ</td>
+          <td>び</td>
+          <td>ぴ</td>
+          <td>み</td>
+          <td></td>
+          <td></td>
+          <td>り</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <th>u</th>
+          <td>う</td>
+          <td>く</td>
+          <td>ぐ</td>
+          <td>す</td>
+          <td>ず</td>
+          <td>つ</td>
+          <td>づ</td>
+          <td>ぬ</td>
+          <td>ふ</td>
+          <td>ぶ</td>
+          <td>ぷ</td>
+          <td>む</td>
+          <td>ゆ</td>
+          <td>ゅ</td>
+          <td>る</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <th>e</th>
+          <td>え</td>
+          <td>け</td>
+          <td>げ</td>
+          <td>せ</td>
+          <td>ぜ</td>
+          <td>て</td>
+          <td>で</td>
+          <td>ね</td>
+          <td>へ</td>
+          <td>べ</td>
+          <td>ぺ</td>
+          <td>め</td>
+          <td></td>
+          <td></td>
+          <td>れ</td>
+          <td></td>
+        </tr>
+      
+        <tr>
+          <th>o</th>
+          <td>お</td>
+          <td>こ</td>
+          <td>ご</td>
+          <td>そ</td>
+          <td>ぞ</td>
+          <td>と</td>
+          <td>ど</td>
+          <td>の</td>
+          <td>ほ</td>
+          <td>ぼ</td>
+          <td>ぽ</td>
+          <td>も</td>
+          <td>よ</td>
+          <td>ょ</td>
+          <td>ろ</td>
+          <td>を</td>
+        </tr>
+
+        <tr>
+          <th>_</th>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>っ</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td>ん</td>
+        </tr>
+      </tbody>
+    </table>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+    <script>
+// http://blog-imgs-27.fc2.com/t/a/f/taffy632/hiragana1gram.txt
+const mapping = {"い":57935,"ん":42701,"う":36148,"。":35952,"か":35851,"し":33494,"な":32795,"、":31925,"と":30033,"た":29796,"っ":27479,"の":26369,"て":25363,"・":24611,"SPC":20195,"も":19892,"く":18983,"き":18544,"で":18312,"が":18209,"こ":18158,"に":17914,"ー":17901,"は":17621,"る":17416,"だ":17202,"あ":16108,"す":15279,"ま":14967,"ら":14576,"お":14008,"り":12828,"れ":11708,"さ":10392,"ょ":10371,"じ":10310,"よ":10305,"け":9970,"わ":9929,"つ":9825,"ど":9814,"そ":9495,"ち":8592,"え":8200,"を":8024,"や":7357,"ね":7224,"ろ":7097,"み":6184,"せ":5470,"－":5367,"WSP":5144,"ゃ":4823,"ほ":4807,"め":4733,"！":4677,"ひ":4227,"ば":4008,"ふ":3945,"む":3746,"ぶ":3364,"ゅ":3272,"げ":3187,"？":2750,"ご":2518,"ず":2289,"ぎ":2031,"ぱ":1948,"（":1878,"「":1768,"」":1763,"）":1639,"び":1635,"ぜ":1627,"ぐ":1600,"～":1559,"べ":1383,"ゆ":1332,"へ":1300,"ぼ":1223,"ぷ":1185,"ざ":1080,"ぽ":774,"ぞ":714,"１":714,"ぃ":696,"２":683,"”":630,"ぴ":619,"０":557,"ぬ":503,"３":423,"づ":418,"ぁ":348,"Ｂ":317,"ぇ":290,"Ａ":278,"ぺ":266,"４":258,"Ｄ":242,"Ｓ":241,"５":237,"＝":230,"［":222,"＜":215,"Ｐ":211,"Ｈ":209,"Ｍ":205,"‘":204,"ｈ":186,"＞":185,"Ｇ":176,"＆":156,"Ｌ":149,"６":148,"７":145,"８":143,"Ｏ":138,"Ｃ":135,"＃":133,"ｅ":130,"：":127,"ぅ":119,"ａ":118,"ヴ":106,"，":102,"Ｅ":99,"９":99,"ぉ":99,"ｄ":89,"Ｒ":84,"ｃ":83,"．":82,"Ｔ":80,"Ｆ":79,"Ｎ":76,"Ｘ":75,"’":69,"ｎ":63,"ｖ":63,"］":60,"ｉ":54,"ｏ":52,"＠":50,"Ｋ":46,"Ｉ":46,"ｙ":40,"ｒ":40,"ぢ":40,"｜":36,"Ｕ":32,"／":30,"％":29,"ｆ":28,"":27,"Ｙ":27,"＿":27,"ｊ":27,"＋":26,"":26,"ｔ":24,"ｍ":23,"ｓ":23,"赶":22,"｝":22,"Ｊ":22,"ｗ":21,"":21,"Ｗ":20,"ｋ":19,"Ｖ":19,"":19,"Ｚ":18,"｛":18,"ｐ":18,"ｇ":18,"ｌ":13,"＾":10,"ｂ":10,"ｕ":9,"Ｑ":9,"":8,"ｚ":8,"ｘ":8,"゛":6,"゜":6,"":4,"＊":4,"":3,"；":3,"":2,"":1,"":1,"":1,"�":1,"":1,"":1,"ｑ":1,"":1,"undefined":null};
+let sum = 0;
+for (const value of Object.values(mapping)) sum += value;
+for (const key in mapping) mapping[key] /= sum;
+
+for (const cell of document.querySelectorAll("#table td")) {
+  const key = cell.textContent;
+  if (!key) continue;
+  const br = document.createElement("br");
+  const value = document.createTextNode((mapping[key] ?? 0).toFixed(5).slice(1));
+  cell.appendChild(br);
+  cell.appendChild(value);
+  cell.style.backgroundColor = `rgba(0, 255, 0, ${Math.sqrt(mapping[key])})`;
+}
+    </script>
+  </body>
+</html>
