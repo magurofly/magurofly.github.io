@@ -260,6 +260,7 @@ class Board {
         }
       }
     }
+    if (!dryRun && flipCount > 0) this.set(i, j, color);
     return flipCount;
   }
 }
