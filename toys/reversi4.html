@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>4 Reversi</title>
+  </head>
+  <body>
+    <table id="board"></table>
+    <style>
+#board {
+  border: solid 2px #aaa;
+  border-collapse: collapse;
+}
+
+#board td {
+  border: solid 2px #aaa;
+  background-color: white;
+  padding: 0.5vmin;
+  width: 4vmin;
+  height: 4vmin;
+}
+#board td.color-1:before {
+  content: "";
+  display: block;
+  width: 3vmin;
+  height: 3vmin;
+  border: outset 0.5vmin #c00;
+  border-radius: 100%;
+  background-color: #f00;
+}
+#board td.color-5:before {
+  content: "";
+  display: block;
+  width: 4vmin;
+  height: 4vmin;
+  background-color: #fcc;
+}
+#board td.color-2:before {
+  content: "";
+  display: block;
+  width: 3vmin;
+  height: 3vmin;
+  border: outset 0.5vmin #0ac;
+  border-radius: 100%;
+  background-color: #0cf;
+}
+#board td.color-6:before {
+  content: "";
+  display: block;
+  width: 4vmin;
+  height: 4vmin;
+  background-color: #cef;
+}
+#board td.color-3:before {
+  content: "";
+  display: block;
+  width: 3vmin;
+  height: 3vmin;
+  border: outset 0.5vmin #ca0;
+  border-radius: 100%;
+  background-color: #fe0;
+}
+#board td.color-7:before {
+  content: "";
+  display: block;
+  width: 4vmin;
+  height: 4vmin;
+  background-color: #fec;
+}
+#board td.color-4:before {
+  content: "";
+  display: block;
+  width: 3vmin;
+  height: 3vmin;
+  border: outset 0.5vmin #0a0;
+  border-radius: 100%;
+  background-color: #0c0;
+}
+#board td.color-8:before {
+  content: "";
+  display: block;
+  width: 4vmin;
+  height: 4vmin;
+  background-color: #dfd;
+}
+    </style>
+    <script>
+const boardView = {
+  table: document.querySelector("#board"),
+  callbacks: [],
+  init() {
+    const elements = [];
+    for (let i = 0; i < 16; i++) {
+      const row = [];
+      const tr = document.createElement("tr");
+      for (let j = 0; j < 16; j++) {
+        const td = document.createElement("td");
+        td.onclick = ((i, j) => {
+          for (const callback of this.callbacks) callback(i, j);
+        }).bind(this, i, j); // null でもいいけど this にしておこう
+        row.push(td);
+        tr.appendChild(td);
+      }
+      elements.push(row);
+      this.table.appendChild(tr);
+    }
+    this.elements = elements;
+  },
+  onClick(callback) {
+    this.callbacks.push(callback);
+  },
+  setColor(i, j, color) {
+    if (color == 0) {
+      this.elements[i][j].className = "";
+    } else {
+      this.elements[i][j].className = `color-${color}`;
+    }
+  },
+};
+boardView.init();
+
+class Board {
+  constructor(view) {
+    this.view = view;
+    this.turn = 1;
+    this.discs = [];
+    this.hints = [];
+
+    this.view.onClick(this.put.bind(this));
+
+    for (let i = 0; i < 16; i++) {
+      const row = [];
+      for (let j = 0; j < 16; j++) row.push(0);
+      this.discs.push(row);
+    }
+
+    this.set(6, 6, 1);
+    this.set(7, 8, 1);
+    this.set(8, 6, 1);
+    this.set(9, 8, 1);
+    this.set(6, 7, 2);
+    this.set(7, 9, 2);
+    this.set(8, 7, 2);
+    this.set(9, 9, 2);
+    this.set(6, 8, 3);
+    this.set(7, 6, 3);
+    this.set(8, 8, 3);
+    this.set(9, 6, 3);
+    this.set(6, 9, 4);
+    this.set(7, 7, 4);
+    this.set(8, 9, 4);
+    this.set(9, 7, 4);
+
+    this.hint();
+  }
+
+  get(i, j) {
+    return this.discs[i][j];
+  }
+
+  set(i, j, c) {
+    this.discs[i][j] = c;
+    this.view.setColor(i, j, c);
+  }
+
+  pass() {
+    for (;;) {
+      this.turn = this.turn % 4 + 1;
+      if (this.hint()) break;
+    }
+  }
+
+  hint() {
+    this.hints = this.enumeratePutPoint();
+    if (this.hints.length == 0) return false;
+    for (const k of this.hints) {
+      const i = k >> 4, j = k & 15;
+      this.view.setColor(i, j, this.turn + 4);
+    }
+    return true;
+  }
+
+  clearHints() {
+    if (this.hints) {
+      for (const k of this.hints) {
+        const i = k >> 4, j = k & 15;
+        this.view.setColor(i, j, 0);
+      }
+      this.hints = null;
+    }
+  }
+
+  enumeratePutPoint(color = this.turn) {
+    const set = new Set;
+    const check = (i0, j0, di, dj) => {
+      let i = i0, j = j0;
+      let s = 0;
+      while (0 <= i && i < 15 && 0 <= j && j < 15) {
+        const x = this.get(i, j);
+        if (s == 0) {
+          if (x == color) s = 1;
+        } else if (s == 1) {
+          if (x == 0) s = 0;
+          else if (x != color) s = 2;
+        } else if (s == 2) {
+          if (x == 0) {
+            set.add(i << 4 | j);
+            s = 0;
+          } else if (x == color) {
+            s = 1;
+          }
+        }
+        i += di;
+        j += dj;
+      }
+    };
+    for (let di = -1; di <= 1; di++) for (let dj = -1; dj <= 1; dj++) {
+      if (di == 0 && dj == 0) continue;
+      for (let k = 0; k < 16; k++) {
+        check(k, 0, di, dj);
+        check(k, 15, di, dj);
+        check(0, k, di, dj);
+        check(15, k, di, dj);
+      }
+    }
+    return set;
+  }
+
+  put(i, j) {
+    const count = this.flip(i, j);
+    if (count > 0) {
+      this.clearHints();
+      this.pass();
+    }
+  }
+
+  flip(i, j, color = this.turn, dryRun = false) {
+    if (this.get(i, j) != 0) return 0;
+    let flipCount = 0;
+    for (let di = -1; di <= 1; di++) {
+      for (let dj = -1; dj <= 1; dj++) {
+        if (di == 0 && dj == 0) continue;
+        let _i = i + di, _j = j + dj;
+        let between = [];
+        while (0 <= _i && _i < 16 && 0 <= _j && _j < 16) {
+          if (this.get(_i, _j) == color) {
+            flipCount += between.length;
+            if (!dryRun) for (const [i, j] of between) this.set(i, j, color);
+            break;
+          }
+          between.push([_i, _j]);
+          _i += di;
+          _j += dj;
+        }
+      }
+    }
+    return flipCount;
+  }
+}
+
+new Board(boardView);
+    </script>
+  </body>
+</html>
