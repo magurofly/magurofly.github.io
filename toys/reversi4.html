@@ -13,10 +13,9 @@
   <body>
     <ul class="row">
       <li><table id="board"></table></li>
-      <li><textarea id="log" cols="10"></textarea></li>
-      <li>
-        <button type="button" onclick="game.pass()">パス</button>
-      </li>
+      <li><textarea id="log" rows="2" cols="10"></textarea></li>
+      <li><button type="button" onclick="game.pass()">パス</button></li>
+      <li><button type="button" onclick="game.putCOM()">COMに打たせる</button></li>
     </ul>
     <style>
 ul.row {
@@ -28,7 +27,6 @@ ul.row li {
 }
 
 #log {
-  height: 80vmin;
 }
 
 #board {
@@ -109,6 +107,76 @@ ul.row li {
 }
     </style>
     <script>
+
+const util = {
+  sleep(ms) {
+    return new Promise(done => setTimeout(done, ms));
+  },
+  enumeratePutPoint(board, color) {
+    const set = new Set;
+    const check = (i0, j0, di, dj) => {
+      let i = i0, j = j0;
+      let s = 0;
+      while (0 <= i && i < 16 && 0 <= j && j < 16) {
+        const x = board.get(i, j);
+        if (s == 0) {
+          if (x == color) s = 1;
+        } else if (s == 1) {
+          if (x == 0) s = 0;
+          else if (x != color) s = 2;
+        } else if (s == 2) {
+          if (x == 0) {
+            set.add(i << 4 | j);
+            s = 0;
+          } else if (x == color) {
+            s = 1;
+          }
+        }
+        i += di;
+        j += dj;
+      }
+    };
+    for (let di = -1; di <= 1; di++) for (let dj = -1; dj <= 1; dj++) {
+      if (di == 0 && dj == 0) continue;
+      for (let k = 0; k < 16; k++) {
+        check(k, 0, di, dj);
+        check(k, 15, di, dj);
+        check(0, k, di, dj);
+        check(15, k, di, dj);
+      }
+    }
+    return set;
+  },
+  flip(board, i, j, color, dryRun = false) {
+    if (board.get(i, j) != 0) return 0;
+    let flipCount = 0;
+    for (let di = -1; di <= 1; di++) {
+      for (let dj = -1; dj <= 1; dj++) {
+        if (di == 0 && dj == 0) continue;
+        let _i = i + di, _j = j + dj;
+        let between = [];
+        while (0 <= _i && _i < 16 && 0 <= _j && _j < 16) {
+          const x = board.get(_i, _j);
+          if (x == 0) {
+            break;
+          } else if (x == color) {
+            flipCount += between.length;
+            if (!dryRun) for (const [__i, __j] of between) board.set(__i, __j, color);
+            break;
+          }
+          between.push([_i, _j]);
+          _i += di;
+          _j += dj;
+        }
+      }
+    }
+    if (!dryRun && flipCount > 0) {
+      board.set(i, j, color);
+    }
+    return flipCount;
+  }
+};
+
 const boardView = {
   table: document.querySelector("#board"),
   callbacks: [],
@@ -150,7 +218,7 @@ class Board {
     this.view = view;
     this.logger = log;
     this.turn = 1;
-    this.discs = [];
+    this.board = [];
     this.hints = [];
 
     this.view.onClick(this.put.bind(this));
@@ -158,24 +226,24 @@ class Board {
     for (let i = 0; i < 16; i++) {
       const row = [];
       for (let j = 0; j < 16; j++) row.push(0);
-      this.discs.push(row);
+      this.board.push(row);
     }
 
     this.set(6, 6, 1);
-    this.set(7, 8, 1);
+    this.set(6, 8, 1);
     this.set(8, 6, 1);
-    this.set(9, 8, 1);
+    this.set(8, 8, 1);
     this.set(6, 7, 2);
-    this.set(7, 9, 2);
+    this.set(6, 9, 2);
     this.set(8, 7, 2);
-    this.set(9, 9, 2);
-    this.set(6, 8, 3);
+    this.set(8, 9, 2);
+    this.set(7, 8, 3);
     this.set(7, 6, 3);
-    this.set(8, 8, 3);
+    this.set(9, 8, 3);
     this.set(9, 6, 3);
-    this.set(6, 9, 4);
+    this.set(7, 9, 4);
     this.set(7, 7, 4);
-    this.set(8, 9, 4);
+    this.set(9, 9, 4);
     this.set(9, 7, 4);
 
     this.hint();
@@ -187,20 +255,21 @@ class Board {
   }
 
   get(i, j) {
-    return this.discs[i][j];
+    return this.board[i][j];
   }
 
   set(i, j, c) {
-    this.discs[i][j] = c;
+    this.board[i][j] = c;
     this.view.setColor(i, j, c);
   }
 
-  changeTurns() {
+  async changeTurns() {
     for (;;) {
-      this.clearHints();
       this.turn = this.turn % 4 + 1;
       if (this.hint()) break;
-      this.pass();
+      await util.sleep(100);
+      console.log(this.turn, this.enumeratePutPoint(this.turn));
+      this.log("pass");
     }
   }
 
@@ -210,8 +279,9 @@ class Board {
   }
 
   hint() {
+    this.clearHints();
     this.hints = this.enumeratePutPoint();
-    if (this.hints.length == 0) return false;
+    if (this.hints.size == 0) return false;
     for (const k of this.hints) {
       const i = k >> 4, j = k & 15;
       this.view.setColor(i, j, this.turn + 4);
@@ -230,39 +300,7 @@ class Board {
   }
 
   enumeratePutPoint(color = this.turn) {
-    const set = new Set;
-    const check = (i0, j0, di, dj) => {
-      let i = i0, j = j0;
-      let s = 0;
-      while (0 <= i && i < 16 && 0 <= j && j < 16) {
-        const x = this.get(i, j);
-        if (s == 0) {
-          if (x == color) s = 1;
-        } else if (s == 1) {
-          if (x == 0) s = 0;
-          else if (x != color) s = 2;
-        } else if (s == 2) {
-          if (x == 0) {
-            set.add(i << 4 | j);
-            s = 0;
-          } else if (x == color) {
-            s = 1;
-          }
-        }
-        i += di;
-        j += dj;
-      }
-    };
-    for (let di = -1; di <= 1; di++) for (let dj = -1; dj <= 1; dj++) {
-      if (di == 0 && dj == 0) continue;
-      for (let k = 0; k < 16; k++) {
-        check(k, 0, di, dj);
-        check(k, 15, di, dj);
-        check(0, k, di, dj);
-        check(15, k, di, dj);
-      }
-    }
-    return set;
+    return util.enumeratePutPoint(this, color);
   }
 
   put(i, j) {
@@ -274,33 +312,74 @@ class Board {
     }
   }
 
+  putCOM() {
+    const [[i, j], score] = new PersistentBoard(this.board).computeBest(this.turn);
+    console.log("(%d, %d): %d", i, j, score);
+    this.put(i, j);
+  }
+
   flip(i, j, color = this.turn, dryRun = false) {
-    if (this.get(i, j) != 0) return 0;
-    let flipCount = 0;
-    for (let di = -1; di <= 1; di++) {
-      for (let dj = -1; dj <= 1; dj++) {
-        if (di == 0 && dj == 0) continue;
-        let _i = i + di, _j = j + dj;
-        let between = [];
-        while (0 <= _i && _i < 16 && 0 <= _j && _j < 16) {
-          const x = this.get(_i, _j);
-          if (x == 0) {
-            break;
-          } else if (x == color) {
-            flipCount += between.length;
-            if (!dryRun) for (const [__i, __j] of between) this.set(__i, __j, color);
-            break;
-          }
-          between.push([_i, _j]);
-          _i += di;
-          _j += dj;
-        }
+    return util.flip(this, i, j, color, dryRun);
+  }
+}
+
+class PersistentBoard {
+  constructor(copyFrom = null) {
+    this.board = [];
+    this.isOriginal = [];
+    for (let i = 0; i < 16; i++) {
+      this.board.push(copyFrom[i]);
+      this.isOriginal.push(true);
+    }
+  }
+
+  get(i, j) {
+    return this.board[i][j];
+  }
+
+  set(i, j, c) {
+    if (this.isOriginal[i]) {
+      this.isOriginal[i] = false;
+      this.board[i] = this.board[i].slice();
+    }
+    this.board[i][j] = c;
+  }
+
+  flip(i, j, color, dryRun = false) {
+    return util.flip(this, i, j, color, dryRun);
+  }
+
+  copy() {
+    for (let i = 0; i < 16; i++) {
+      this.isOriginal[i] = true;
+    }
+    return new PersistentBoard(this.board);
+  }
+
+  eval(color) {
+    return util.enumeratePutPoint(this, color).size;
+  }
+
+  // depth ターン後に最善になるような [手, 評価値] を求める
+  computeBest(color, turn = color, depth = 4) {
+    if (depth == 0) {
+      return [null, this.eval(color)];
+    }
+
+    let best = null;
+    let bestScore = null;
+    const possibles = util.enumeratePutPoint(this, turn);
+    for (const k of possibles) {
+      const i = k >> 4, j = k & 15;
+      const board2 = this.copy();
+      board2.flip(i, j, turn);
+      const [best2, bestScore2] = board2.computeBest(color, turn % 4 + 1, depth - 1);
+      if (!bestScore || (turn == color) && bestScore < bestScore2 || (turn != color) && bestScore > bestScore2) {
+        best = [i, j];
+        bestScore = bestScore2;
       }
     }
-    if (!dryRun && flipCount > 0) {
-      this.set(i, j, color);
-    }
-    return flipCount;
+    return [best, bestScore];
   }
 }
 
@@ -308,6 +387,7 @@ const game = new Board(boardView, text => {
   log.value += text + "\n";
   log.scrollTo(0, log.scrollHeight);
 });
+
     </script>
   </body>
 </html>
