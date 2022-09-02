@@ -26,3 +26,6 @@
 - おもちゃ
   - [オムペンさんのツイートを参考に作った時計](https://magurofly.github.io/toys/clock)
   - [変なmodから本物を探すゲーム](https://magurofly.github.io/toys/998244853), [Hard](https://magurofly.github.io/toys/998244853-hard)
+  - [4 色リバーシ](https://magurofly.github.io/toys/reversi4.html)
+- 謎
+  - [Brainfuck を生成するツール](https://github.com/magurofly/brainfuck-combinator)
