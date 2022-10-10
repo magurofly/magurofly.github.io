@@ -177,7 +177,7 @@ async function onSelectionChange() {
   // if (document.querySelector("#minify-output").checked) {
   //   output = minify(output);
   // }
-  output = output.replace(/#!\[doc.*/g, "");
+  output = output.replace(/#!\[doc.*\n*|extern crate __acl_\w+ as \w+;/g, "");
   document.querySelector("#output").value = output;
   loading.classList.add("d-none");
 }
