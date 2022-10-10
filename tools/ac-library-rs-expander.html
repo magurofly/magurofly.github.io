@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <title>ac-library-rs expander</title>
+    <meta name="twitter:card" content="summary">
+    <meta property="og:title" content="ac-library-rs expander">
+    <meta property="og:description" content="ac-library-rs を展開します">
+  </head>
+  <body>
+    <section class="container">
+      <form>
+        <fieldset>
+          <legend>Libraries</legend>
+          <div class="row">
+            <div class="col-sm-6 col-12">
+              <button type="button" class="btn btn-primary w-100" id="select-all">Select All</button>
+            </div>
+            <div class="col-sm-6 col-12">
+              <button type="button" class="btn btn-secondary w-100" id="deselect-all">Deselect All</button>
+            </div>
+          </div>
+          <div class="row">
+            <ul id="libraries"></ul>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Output</legend>
+          <div class="row">
+            <!--div class="col-12">
+              <input type="checkbox" id="minify-output">
+              <label for="minify-output">Minify Output</label>
+            </div-->
+            <div class="col-12">
+              <button type="button" class="btn btn-primary" id="copy">Copy</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <div class="d-flex justify-content-center my-1 d-none" id="loading">
+                <div class="spinner-border" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <textarea readonly id="output" class="w-100 font-monospace" rows="30"></textarea>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </section>
+    <div id="copied" class="position-fixed bottom-0 start-0 toast hide align-items-center" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="1000">
+      <div class="d-flex">
+        <div class="toast-body">
+        Copied!
+       </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+
+    <script>
+const urlLib = (library) => `https://cdn.jsdelivr.net/gh/rust-lang-ja/ac-library-rs/src/${library}.rs`;
+const urlSrc = (library) => `https://github.com/rust-lang-ja/ac-library-rs/blob/master/src/${library}.rs`;
+
+const libraries = {
+  "convolution": ["internal_bit", "modint"],
+  "lazysegtree": ["internal_bit", "segtree"],
+  "math": ["internal_math"],
+  "maxflow": ["internal_type_traits", "internal_queue"],
+  "mincostflow": ["internal_type_traits"],
+  "modint": ["internal_math"],
+  "scc": ["internal_scc"],
+  "segtree": ["internal_bit", "internal_type_traits"],
+  "twosat": ["internal_scc"],
+  "internal_bit": [],
+  "internal_scc": [],
+  "internal_math": [],
+  "internal_type_traits": [],
+  "internal_queue": [],
+};
+
+async function loadLibraries(libraries) {
+  const output = [];
+  for (const library of libraries) {
+    const text = await fetch(urlLib(library)).then(result => result.text());
+    output.push(text);
+  }
+  return output.join("\n");
+}
+
+function minify(text) {
+  text = text.replace(/\/\/.*$/gm, "");
+  text = text.replace(/\/*(?:[^*]|\*[^/])*\*\//g, "");
+  text = text.replace(/[ \t]+/g, " ");
+  text = text.replace(/(?!\])\n/g, "");
+  return text;
+}
+
+const postorder = [];
+{
+  const visited = new Set();
+  function dfs(key) {
+    visited.add(key);
+    for (const next of libraries[key]) {
+      if (visited.has(next)) continue;
+      dfs(next);
+    }
+    postorder.push(key);
+  }
+  for (const key of Object.keys(libraries).sort()) if (!visited.has(key)) dfs(key);
+}
+
+const preorder = [];
+{
+  const visited = new Set();
+  function dfs(key) {
+    visited.add(key);
+    for (const next of libraries[key]) {
+      if (visited.has(next)) continue;
+      dfs(next);
+    }
+    preorder.push(key);
+  }
+  for (const key of Object.keys(libraries).sort().reverse()) if (!visited.has(key)) dfs(key);
+  preorder.reverse();
+}
+
+const ulLibraries = document.querySelector("#libraries");
+const checkboxes = {};
+for (const key of preorder) {
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.dataset.library = key;
+  checkbox.addEventListener("change", onSelectionChange);
+  checkboxes[key] = checkbox;
+  const label = document.createElement("label");
+  label.className = "font-monospace";
+  label.textContent = key;
+  label.htmlFor = checkbox.id = `check-${key}`;
+  const li = document.createElement("li");
+  li.appendChild(checkbox);
+  li.appendChild(label);
+  ulLibraries.appendChild(li);
+}
+
+async function onSelectionChange() {
+  const loading = document.querySelector("#loading");
+  loading.classList.remove("d-none");
+  const result = [];
+  for (const library of preorder) {
+    checkboxes[library].disabled = false;
+  }
+  for (const library of preorder) {
+    if (checkboxes[library].checked) for (const dependent of libraries[library]) {
+      checkboxes[dependent].checked = true;
+      checkboxes[dependent].disabled = true;
+    }
+  }
+  for (const library of postorder) {
+    if (checkboxes[library].checked) {
+      result.push(library);
+    }
+  }
+  let output = await loadLibraries(result);
+  // if (document.querySelector("#minify-output").checked) {
+  //   output = minify(output);
+  // }
+  document.querySelector("#output").value = output;
+  loading.classList.add("d-none");
+}
+
+document.querySelector("#select-all").addEventListener("click", () => {
+  for (const library of preorder) {
+    checkboxes[library].checked = true;
+  }
+  onSelectionChange();
+});
+
+document.querySelector("#deselect-all").addEventListener("click", () => {
+  for (const library of preorder) {
+    checkboxes[library].checked = false;
+  }
+  onSelectionChange();
+});
+
+// document.querySelector("#minify-output").addEventListener("change", onSelectionChange);
+
+const copied = new bootstrap.Toast(document.querySelector("#copied"));
+document.querySelector("#copy").addEventListener("click", () => {
+  const output = document.querySelector("#output");
+  navigator.clipboard.writeText(output.value).then(() => {
+    // success
+    copied.show();
+  }, () => {
+    // failed
+  });
+});
+    </script>
+  </body>
+</html>
