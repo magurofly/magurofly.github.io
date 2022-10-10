@@ -168,7 +168,7 @@ async function onSelectionChange() {
       checkboxes[dependent].disabled = true;
     }
   }
-  for (const library of postorder) {
+  for (const library of preorder) {
     if (checkboxes[library].checked) {
       result.push(library);
     }
@@ -177,6 +177,7 @@ async function onSelectionChange() {
   // if (document.querySelector("#minify-output").checked) {
   //   output = minify(output);
   // }
+  output = output.replace(/#!\[doc.*/g, "");
   document.querySelector("#output").value = output;
   loading.classList.add("d-none");
 }
