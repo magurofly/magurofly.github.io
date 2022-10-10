@@ -63,8 +63,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
 
     <script>
-const urlLib = (library) => `https://cdn.jsdelivr.net/gh/rust-lang-ja/ac-library-rs/src/${library}.rs`;
-const urlSrc = (library) => `https://github.com/rust-lang-ja/ac-library-rs/blob/master/src/${library}.rs`;
+const urlLib = (library) => `https://cdn.jsdelivr.net/gh/qryxip/ac-library-rs-parted/ac-library-rs-parted-${library.replace(/_/g, "-")}/src/lib.rs`;
+const urlSrc = (library) => `https://github.com/qryxip/ac-library-rs-parted/blob/master/ac-library-rs-parted-${library.replace(/_/g, "-")}/src/lib.rs`;
 
 const libraries = {
   "convolution": ["internal_bit", "modint"],
@@ -134,19 +134,24 @@ const preorder = [];
 
 const ulLibraries = document.querySelector("#libraries");
 const checkboxes = {};
-for (const key of preorder) {
+for (const library of preorder) {
   const checkbox = document.createElement("input");
   checkbox.type = "checkbox";
-  checkbox.dataset.library = key;
+  checkbox.dataset.library = library;
   checkbox.addEventListener("change", onSelectionChange);
-  checkboxes[key] = checkbox;
+  checkboxes[library] = checkbox;
   const label = document.createElement("label");
-  label.className = "font-monospace";
-  label.textContent = key;
-  label.htmlFor = checkbox.id = `check-${key}`;
+  label.className = "font-monospace fw-bold";
+  label.textContent = library;
+  label.htmlFor = checkbox.id = `check-${library}`;
+  const link = document.createElement("a");
+  link.className = "mx-1";
+  link.textContent = "src";
+  link.href = urlSrc(library);
   const li = document.createElement("li");
   li.appendChild(checkbox);
   li.appendChild(label);
+  li.appendChild(link);
   ulLibraries.appendChild(li);
 }
 
