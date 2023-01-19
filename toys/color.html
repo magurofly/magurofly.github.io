@@ -1,0 +1,26 @@
+<style>
+  body {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vw;
+    overflow: hidden;
+  }
+</style>
+<script>
+  const color = location.query.slice(1);
+  const patterns = [
+    /^\s*[-\w]+\s*$/,
+    /^\s*rgba?\s*\([\s,./\d]+)\s*$/i,
+    /^\s*hsla?\s*\([\s,./\d]+)\s*$/i,
+    /^#[0-9a-f]{3,4}$/i,
+    /^#[0-9a-f]{6}$/i,
+    /^#[0-9a-f]{8}$/i
+    ];
+  if (patterns.some(pattern => pattern.test(color))) {
+    document.body.style.backgroundColor = color;
+  }
+</script>
