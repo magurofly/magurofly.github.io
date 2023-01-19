@@ -15,7 +15,7 @@
   }
 </style>
 <script>
-  const color = location.query.slice(1);
+  const color = location.search.slice(1);
   const patterns = [
     /^\s*[-\w]+\s*$/,
     /^\s*rgba?\s*\([\s,./\d]+\)\s*$/i,
