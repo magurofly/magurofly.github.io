@@ -18,8 +18,8 @@
   const color = location.query.slice(1);
   const patterns = [
     /^\s*[-\w]+\s*$/,
-    /^\s*rgba?\s*\([\s,./\d]+)\s*$/i,
-    /^\s*hsla?\s*\([\s,./\d]+)\s*$/i,
+    /^\s*rgba?\s*\([\s,./\d]+\)\s*$/i,
+    /^\s*hsla?\s*\([\s,./\d]+\)\s*$/i,
     /^#[0-9a-f]{3,4}$/i,
     /^#[0-9a-f]{6}$/i,
     /^#[0-9a-f]{8}$/i
