@@ -1,0 +1,146 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:title" content="楽器？">
+  <meta name="twitter:image" content="https://user-images.githubusercontent.com/54321436/221368732-49ae537f-ed8c-401a-b996-cbd03432759e.png">
+  <title>Test Instrument</title>
+  <style>
+#table {
+  border: solid 3px #333;
+  border-collapse: collapse;
+}
+  </style>
+</head>
+<body>
+  <table id="table" oncontextmenu="return false" onselectstart="return false">
+    <tbody></tbody>
+  </table>
+  <script>
+// 使う音の範囲
+const usingToneRange = { from: 36, upto: 72 };
+// 使う音色(PeriodicWaveのa項)
+const wave = [0.63, 0.17];
+// 鳴らし始め
+const starts = [
+  { duration: 0.03, value: 1.0 },
+  { duration: 0.170, value: 0.8 },
+];
+// 鳴らし終わり
+const ends = [
+  { duration: 0.012, value: 0.1 },
+  { duration: 0.1, value: 0 },
+];
+
+const view = (() => {
+  const toneNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+  const table = document.querySelector("#table");
+  const buttons = [];
+  const listenersStart = [];
+  const listenersStop = [];
+  for (let i = 2; i >= 0; i--) {
+    const row = document.createElement("tr");
+    for (let j = 0; j < 12; j++) {
+      const button = document.createElement("td");
+      button.dataset.tone = `${36 + 12 * i + j}`;
+      button.textContent = `${toneNames[j]}${i + 2}`;
+      button.style.width = `${100/14}vw`;
+      button.style.height = `${100/4}vh`;
+      button.style.border = `solid 2px #333`;
+      button.style.textAlign = `center`;
+      button.style.backgroundColor = `hsl(${360 / 12 * j}deg, 100%, ${100 * (0.3 + 0.1 * i)}%)`;
+      row.appendChild(button);
+      button.addEventListener("mousedown", _ => {
+        for (const listener of listenersStart) listener(button.dataset.tone);
+      });
+      button.addEventListener("touchstart", _ => {
+        for (const listener of listenersStart) listener(button.dataset.tone);
+      });
+      button.addEventListener("mouseout", _ => {
+        for (const listener of listenersStop) listener(button.dataset.tone);
+      });
+      button.addEventListener("touchend", _ => {
+        for (const listener of listenersStop) listener(button.dataset.tone);
+      });
+      button.addEventListener("mouseup", _ => {
+        for (const listener of listenersStop) listener(button.dataset.tone);
+      });
+    }
+    table.tBodies[0].appendChild(row);
+  }
+  return {
+    listenDown(f) {
+      listenersStart.push(f);
+    },
+    listenUp(f) {
+      listenersStop.push(f);
+    }
+  };
+})();
+
+
+// player
+const create = () => {
+  const ctx = new AudioContext;
+
+  const real = new Float32Array([0].concat(wave));
+  const imag = new Float32Array([0].concat(wave.map(x => -x)));
+  const periodicWave = ctx.createPeriodicWave(real, imag);
+
+  const nodes = {};
+  for (let tone = usingToneRange.from; tone < usingToneRange.upto; tone++) {
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+
+
+    const oscillator = ctx.createOscillator();
+    oscillator.setPeriodicWave(periodicWave);
+    oscillator.frequency.setValueAtTime(440 * Math.pow(2, (tone - 69) / 12), ctx.currentTime);
+    oscillator.start();
+
+    oscillator.connect(gain).connect(ctx.destination);
+    let lastStarted = 0;
+    let lastStopped = 0;
+
+    nodes[tone] = {
+      start() {
+        let time = ctx.currentTime;
+        if (lastStarted > time || lastStopped > time) return;
+        for (const { duration, value } of starts) {
+          time += duration;
+          gain.gain.linearRampToValueAtTime(value, time);
+        }
+        lastStarted = time;
+      },
+      stop() {
+        let time = ctx.currentTime;
+        if (lastStopped > time) return;
+        for (const { duration, value } of ends) {
+          time += duration;
+          gain.gain.linearRampToValueAtTime(value, time);
+        }
+        lastStopped = time;
+      }
+    };
+  }
+
+  view.listenDown(tone => {
+    nodes[tone].start();
+  });
+  view.listenUp(tone => {
+    nodes[tone].stop();
+  });
+
+  console.log("create() success");
+};
+
+const f = () => {
+  create();
+  document.body.removeEventListener("click", f);
+}
+document.body.addEventListener("click", f);
+  </script>
+</body>
+</html>
