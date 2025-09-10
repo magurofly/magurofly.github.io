@@ -30,6 +30,7 @@
             </div>
         </div>
         <div class="col-12 alert alert-secondary text-center my-1" id="word-l">low</div>
+        <p class="col-12">言葉の上下関係が正しければOKボタン、誤っていればSwapボタンを押してください。</p>
     </div>
     
     <div class="row d-none" id="result">
@@ -53,7 +54,7 @@ class Sorter {
     async sort(cmp) {
         this.progress = 0;
         let finished = 0;
-        const all = this.array.length * 2;
+        const all = steps(this.array.length);
         let sort = async (array) => {
             if (array.length <= 1) {
                 finished += array.length;
@@ -83,9 +84,20 @@ class Sorter {
             finished += result.length;
             return result;
         };
-        this.progress = 1;
         this.array = await sort(this.array);
+        this.progress = 1;
     }
+}
+
+function steps(n) {
+    const dp = Array(n + 1);
+    dp[0] = 0;
+    dp[1] = 1;
+    for (let i = 2; i <= n; i++) {
+        const half = i >> 1;
+        dp[i] = dp[half] + dp[i - half] + i;
+    }
+    return dp[n];
 }
 
 let ok = () => {};
@@ -103,6 +115,7 @@ $("#btn-start").click(async () => {
     $("#input-form").addClass("d-none");
     const text = $("#text-sort").val().split(/\n+/);
 
+    $("#progress").val(0);
     const sorter = new Sorter(text);
     $("#sorter").removeClass("d-none");
     await sorter.sort((h, l) => {
