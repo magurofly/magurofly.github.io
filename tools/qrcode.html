@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>QR Code Generator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+    <section class="container">
+        <div class="row">
+            <p class="col-12">下のテキストボックスに QR コード化したい内容を入力し、 [Generate QR Code] ボタンを押下してください。</p>
+        </div>
+        <div class="row">
+            <textarea class="col-12" placeholder="https://" id="text" rows="3"></textarea>
+            <button class="col-12 btn btn-primary" id="button">Generate QR Code</button>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <canvas id="canvas" style="border: solid 1px #000"></canvas>
+            </div>
+        </div>
+    </section>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script type="module">
+        import init, { generate_qrcode } from "./qrcode_wasm.js";
+        
+        init();
+        
+        const eText = document.querySelector("#text");
+        const eButton = document.querySelector("#button");
+        const eCanvas = document.querySelector("#canvas");
+        const ctx = eCanvas.getContext("2d");
+        
+        eButton.onclick = () => {
+            const text = eText.value;
+            const { width, data, error } = generate_qrcode(new TextEncoder().encode(text), 1);
+            if (error) {
+                alert(error);
+                return;
+            }
+            let modulePx = 4;
+            eCanvas.width = modulePx * (width + 4 * 2);
+            eCanvas.height = modulePx * (width + 4 * 2);
+            
+            ctx.fillStyle = "#000";
+            for (let i = 0; i < width; i++) {
+                for (let j = 0; j < width; j++) {
+                    if (data[i * width + j]) {
+                        ctx.fillRect((4 + j) * modulePx, (4 + i) * modulePx, modulePx, modulePx);
+                    }
+                }
+            }
+        };
+    </script>
+</body>
+</html>
