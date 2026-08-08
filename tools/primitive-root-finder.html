@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Primitive Root Finder</title>
+    <meta name="twitter:card" content="summary">
+    <meta property="og:title" content="Primitive Root Finder">
+    <meta property="og:description" content="原始根をひとつ見つけるツール">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css" integrity="sha384-R4558gYOUz8mP9YWpZJjofhk+zx0AS11p36HnD2ZKj/6JR5z27gSSULCNHIRReVs" crossorigin="anonymous">
+</head>
+<body>
+    <section class="container">
+        <div class="row">
+            <div class="col-12">
+                <form>
+                    <div class="mb-3">
+                        <div class="input-group-text">
+                            <label for="use-modulus">素数を入力</label>
+                        </div>
+                        <input name="modulus" class="form-control font-monospace" value="998244353">
+                    </div>
+                    <div class="input-group mb-3">
+                        <button type="button" class="form-control btn btn-primary" onclick="root1.value = findPrimitiveRoot(BigInt(modulus.value)).toString()">原始根をひとつ見つける</button>
+                        <input type="number" class="form-control" name="root1" readonly>
+                    </div>
+                    <div class="input-group mb-3">
+                        <button type="button" class="form-control btn btn-primary" onclick="rootall.value = findAllPrimitiveRoots(BigInt(modulus.value)).join(', ')">原始根をすべて見つける<br>※注意：素数が大きいと時間がかかる</button>
+                        <textarea class="form-control" name="rootall" readonly></textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+    <script>
+        function findPrimitiveRoot(p) {
+            const tester = new PrimitiveRootTester(p);
+            for (let i = 0; i < 100000; i++) {
+                const g = randomRange(1n, p);
+                if (tester.isPrimitiveRoot(g)) {
+                    return g;
+                }
+            }
+            alert("pが素数でない可能性があります");
+            throw "p may be not prime?";
+        }
+
+        function findAllPrimitiveRoots(p) {
+            const g = findPrimitiveRoot(p);
+            const roots = [g];
+            let h = g;
+            const sieve = new LinearSieve(p);
+            const coprime = new Array(Number(p));
+            coprime[1] = true;
+            const phi = p - 1n;
+            for (let k = 2n; k <= p - 2n; k++) {
+                h *= g;
+                h %= p;
+                const _k = Number(k);
+                const lpf = sieve.lpf[_k];
+                if (lpf == k) {
+                    if (phi % k == 0n) {
+                        coprime[_k] = false;
+                    } else {
+                        coprime[_k] = true;
+                    }
+                } else {
+                    const _kk = Number(k / lpf);
+                    if (sieve.lpf[_k] == sieve.lpf[_kk]) {
+                        coprime[_k] = coprime[_kk];
+                    } else {
+                        coprime[_k] = coprime[_kk] && coprime[Number(lpf)];
+                    }
+                }
+                if (coprime[_k]) {
+                    roots.push(h);
+                }
+            }
+            console.log(coprime);
+            roots.sort((a, b) => (a < b) ? -1 : (a > b) ? 1 : 0);
+            return roots;
+        }
+
+        class LinearSieve {
+            constructor(n) {
+                const lpf = new Array(Number(n) + 1);
+                const primes = [2n];
+                for (let i = 2n; i <= n; i += 2n) {
+                    lpf[i] = 2n;
+                }
+                for (let d = 3n; d <= n; d += 2n) {
+                    if (!lpf[d]) {
+                        lpf[d] = d;
+                        primes.push(d);
+                    }
+                    for (const p of primes) {
+                        if (p * d > n || p > lpf[d]) {
+                            break;
+                        }
+                        lpf[p * d] = p;
+                    }
+                }
+                this.lpf = lpf;
+                this.primes = primes;
+            }
+        }
+
+        class PrimitiveRootTester {
+            constructor(p) {
+                if (p <= 1n) {
+                    throw "p is not a prime";
+                }
+                this.p = p;
+                if (p == 2n) {
+                    this.primeFactorsOfPhi = [];
+                    return;
+                }
+                let phi = p - 1n;
+                this.phi = phi;
+                this.primeFactorsOfPhi = [2n];
+                while ((phi & 1n) == 0n) {
+                    phi >>= 1n;
+                }
+                for (let k = 3n; k <= phi; k += 2n) {
+                    if (k * k > phi) {
+                        break;
+                    }
+                    if (phi % k == 0n) {
+                        phi /= k;
+                        this.primeFactorsOfPhi.push(k);
+                        while (phi % k == 0n) {
+                            phi /= k;
+                        }
+                    }
+                }
+                if (phi > 1n) {
+                    this.primeFactorsOfPhi.push(phi);
+                }
+            }
+
+            isPrimitiveRoot(g) {
+                if (g <= 0n || g >= this.p) {
+                    return false;
+                }
+                for (const q of this.primeFactorsOfPhi) {
+                    if (powMod(g, this.phi / q, this.p) == 1n)  {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+
+        function gcd(a, b) {
+            if (a == 0n) {
+                return b;
+            }
+            if (b == 0n) {
+                return a;
+            }
+            let pow2 = 0n;
+            while ((a & 1n) == 0n && (b & 1n) == 0n) {
+                a >>= 1n;
+                b >>= 1n;
+                pow2++;
+            }
+            while ((a & 1n) == 0n) {
+                a >>= 1n;
+            }
+            while ((b & 1n) == 0n) {
+                b >>= 1n;
+            }
+            if (a > b) {
+                const c = a;
+                a = b;
+                b = c;
+            }
+            while (a > 0n) {
+                const c = b % a;
+                b = a;
+                a = c;
+            }
+            return b << pow2;
+        }
+
+        function powMod(a, b, p) {
+            let r = 1n;
+            while (b > 0n) {
+                if ((b & 1n) != 0n) {
+                    r *= a;
+                    r %= p;
+                }
+                a *= a;
+                a %= p;
+                b >>= 1n;
+            }
+            return r;
+        }
+
+        function randomRange(min, sup) {
+            const width = sup - min;
+            const len = bitLength(width);
+            const len32 = len + 31 >> 5;
+            // width < 2^n => len == n
+            const randomU32 = crypto.getRandomValues(new Uint32Array(len32));
+            randomU32[0] &= (1 << (len & 31)) - 1;
+            let x = BigInt(uint32ArrayLeToString16(randomU32));
+            if (x >= width) {
+                x >>= 1n;
+            }
+            return min + x;
+        }
+
+        function uint32ArrayLeToString16(a) {
+            const result = new Array(a.length);
+            let len = a.length;
+            for (let i = 0; i < len; i++) {
+                result[i] = a[i].toString(16).padStart(4, "0");
+            }
+            while (len > 1) {
+                for (let i = 0; i < len; i += 2) {
+                    const s = result[i];
+                    result[i] = null;
+                    result[i >> 1] = s;
+                    if (i + 1 < len) {
+                        result[i >> 1] += result[i + 1];
+                        result[i + 1] = null;
+                    }
+                }
+                len >>= 1;
+            }
+            return "0x" + result[0];
+        }
+
+        function bitLength(n) {
+            const str = n.toString(16);
+            switch (+str[0]) {
+                case 0: case 1:
+                    return str.length * 4 - 3;
+                case 2: case 3:
+                    return str.length * 4 - 2;
+                case 4: case 5: case 6: case 7:
+                    return str.length * 4 - 1;
+                default:
+                    return str.length * 4;
+            }
+        }
+    </script>
+</body>
+</html>
