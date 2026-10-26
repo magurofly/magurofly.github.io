@@ -17,11 +17,18 @@
   </head>
   <body class="font-monospace">
     <div class="container" id="container">
-      <div class="row" id="result" style="max-height: 80vh; overflow-y: auto">
+      <div class="row">
+        <div class="col-12">
+          <pre><code>A(0, n) = n
+A(m+1, 0) = A(m, 1)
+A(m+1, n+1) = A(m, A(m+1, n))</code></pre>
+        </div>
+      </div>
+      <div class="row" id="result" style="max-height: 80vh; overflow: auto; white-space: nowrap">
       </div>
       <div class="row" id="simpl-container">
         <div class="col-12">
-          <form>
+          <form id="form">
             <div class="input-group">
               <input type="text" class="form-control font-monospace" id="expr" placeholder="A(3, 2)" value="A(3, 2)">
               <button type="button" id="btn-simpl" class="btn btn-primary">simpl</button>
@@ -584,6 +591,8 @@ function simpl(expr) {
 const result = document.querySelector("#result");
 const expr = document.querySelector("#expr");
 const btnSimpl = document.querySelector("#btn-simpl");
+const form = document.querySelector("#form");
+let initial = true;
 
 btnSimpl.onclick = () => {
   const col = document.createElement("div");
@@ -591,7 +600,8 @@ btnSimpl.onclick = () => {
   result.appendChild(col);
   try {
     const parsed = AParser.parse(expr.value);
-    col.textContent = parsed.toString();
+    col.textContent = (initial ? "" : "= ") + parsed.toString();
+    initial = false;
     const simplified = simpl(parsed);
     expr.value = simplified.toString();
   } catch (e) {
@@ -600,6 +610,15 @@ btnSimpl.onclick = () => {
     console.error(e);
   }
   result.scrollTo(0, result.scrollHeight);
+};
+
+expr.onchange = () => {
+  initial = true;
+};
+
+form.onsubmit = e => {
+  e.preventDefault();
+  btnSimpl.click();
 };
     </script>
   </body>
