@@ -3,25 +3,208 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="twitter:card" content="player">
-    <meta name="twitter:title" content="Expand Ackermann Function">
-    <meta name="twitter:description" content="A(3, 2) = 29">
-    <meta name="twitter:player" content="https://magurofly.github.io/toys/ackermann">
-    <meta name="twitter:player:width" content="360">
-    <meta name="twitter:player:height" content="200">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="WebRTC Chat">
+    <meta name="twitter:description" content="P2P 技術によりサーバレスでテキストを転送するデモ">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 
     <title>WebRTC Chat</title>
+
+    <style>
+    </style>
   </head>
   <body>
+    <section class="container">
+      <div class="row d-none" id="qr-area">
+        <div class="col-12">
+          <canvas id="qr-canvas"></canvas>
+        </div>
+        <div class="col-12">
+          <textarea id="url" class="w-100" readonly></textarea>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <table id="messages" class="table table-striped table-bordered">
+            <thead>
+              <tr><th>DateTime</th><th>Name</th><th>Message</th></tr>
+            </thead>
+            <tbody id="messages-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <form class="form" id="chat-form">
+        <div class="row">
+          <div class="col-12 col-sm-3">
+            <input type="text" class="form-control" id="name" placeholder="No Name">
+          </div>
+          <div class="col-12 col-sm-7">
+            <input type="text" class="form-control" id="msg" placeholder="Message...">
+          </div>
+          <div class="col-12 col-sm-2">
+            <button type="submit" class="form-control btn-primary" id="send">Send</button>
+          </div>
+        </div>
+      </form>
+    </section>
+    <script type="module">
+        import init, { generate_qrcode } from "/tools/qrcode_wasm.js";
+
+        const eCanvas = document.querySelector("#qr-canvas");
+        const ctx = eCanvas.getContext("2d");
+
+        const { promise: initPromise, resolve } = Promise.withResolvers();
+        
+        window.generateQRCode = async text => {
+            await initPromise;
+            
+            const { width, data, error } = generate_qrcode(new TextEncoder().encode(text), 1);
+            if (error) {
+                alert(error);
+                return;
+            }
+            let modulePx = 4;
+            eCanvas.width = modulePx * (width + 4 * 2);
+            eCanvas.height = modulePx * (width + 4 * 2);
+            
+            ctx.fillStyle = "#000";
+            for (let i = 0; i < width; i++) {
+                for (let j = 0; j < width; j++) {
+                    if (data[i * width + j]) {
+                        ctx.fillRect((4 + j) * modulePx, (4 + i) * modulePx, modulePx, modulePx);
+                    }
+                }
+            }
+        };
+        
+        init();
+        resolve();
+    </script>
 
     <script>
-const connection = new RTCPeerConnection({
-    iceServers:  [{ urls: "stun:stun.l.google.com:19302" }],
-});
-connection.createDataChannel("chat", { id: 0 });
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+if (location.hash.startsWith("#offer=")) {
+  // クライアントの場合
+  decompressText(location.hash.slice("#offer=".length)).then(async sdp => {
+    const connection = new RTCPeerConnection({
+        iceServers:  [{ urls: "stun:stun.l.google.com:19302" }],
+    });
+    connection.createDataChannel("chat", { id: 0 });
+
+    await connection.setRemoteDescription(new RTCSessionDescription({ type: "offer", sdp }));
+
+    const answer = await connection.createAnswer();
+    await connection.setLocalDescription(answer);
+
+    useConnection(connection);
+  });
+} else {
+  // サーバの場合
+  createConnectionAndMakeOffer().then(async connection => {
+    useConnection(connection);
+
+    const offer = await compressText(connection.localDescription.sdp);
+    const url = location.origin + location.pathname + "#offer=" + offer;
+    document.querySelector("#url").value = url;
+    
+    document.querySelector("#qr-area").classList.remove("d-none");
+    await sleep(1000);
+    generateQRCode(url);
+  });
+}
+
+// Vanilla ICE
+async function createConnectionAndMakeOffer() {
+  const connection = new RTCPeerConnection({
+      iceServers:  [{ urls: "stun:stun.l.google.com:19302" }],
+  });
+  connection.createDataChannel("chat", { id: 0 });
+
+  const iceCandidatePromise = new Promise(resolve => {
+    connection.onicecandidate = () => {
+      if (connection.iceGatheringState === "complete") {
+        resolve();
+      }
+    };
+  });
+
+  const offer = await connection.createOffer();
+  await connection.setLocalDescription(offer);
+
+  await iceCandidatePromise;
+
+  const sdp = connection.localDescription;
+  
+  return connection;
+}
+
+async function compressText(text) {
+  let stream = new Blob([text]).stream();
+  stream = stream.pipeThrough(new CompressionStream("gzip"));
+  const rawData = new Uint8Array(await new Response(stream).arrayBuffer());
+  const base64Text = rawData.toBase64();
+  return base64Text;
+}
+
+async function decompressText(base64Text) {
+  const data = Uint8Array.fromBase64(base64Text);
+  let stream = new Blob([data]).stream();
+  stream = stream.pipeThrough(new DecompressionStream("gzip"));
+  const text = await new Response(stream).text();
+  return text;
+}
+
+function addRow(date, name, message) {
+  const messages = document.querySelector("#messages-body");
+  const row = document.createElement("tr");
+  for (const text of [date, name, message]) {
+    const cell = document.createElement("td");
+    cell.textContent = text;
+    row.appendChild(cell);
+  }
+  messages.appendChild(row);
+}
+
+async function useConnection(connection) {
+
+  const channels = new Set();
+  connection.ondatachannel = ({ channel }) => {
+    channels.add(channel);
+
+    channel.onmessage = ({ data }) => {
+      const { date, name, message } = JSON.parse(data);
+      addRow(date, name, message);
+    };
+  };
+
+  const eForm = document.querySelector("#chat-form");
+  const eName = document.querySelector("#name");
+  const eMessage = document.querySelector("#msg");
+  
+  eForm.onsubmit = event => {
+    event.preventDefault();
+
+    const date = new Date().toLocaleString();
+    const name = eName.value;
+    const message = eMessage.value;
+
+    addRow(date, name, message);
+
+    eMessage.value = "";
+
+    const data = JSON.stringify({ date, name, message });
+
+    for (const channel of channels) {
+      channel.send(data);
+    }
+  };
+}
     </script>
   </body>
 </html>
